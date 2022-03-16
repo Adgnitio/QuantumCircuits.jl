@@ -1,0 +1,4 @@
+name = "QuantumCircuits"
+uuid = "ad924a34-1f3f-4025-ae82-e16b6f8ddf61"
+authors = ["Rafał Pracht <rpracht@wp.pl>"]
+version = "0.1.0"
