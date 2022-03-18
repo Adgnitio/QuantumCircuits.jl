@@ -10,17 +10,15 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-module QuantumCircuits
+"Quantum machine learning"
+module QML
 
-include("QCircuits/QCircuits.jl")
-include("QML/QML.jl")
-include("Execute/Execute.jl")
 
-using QuantumCircuits.QCircuits.QBase
-using QuantumCircuits.QCircuits.Registers
-using QuantumCircuits.QCircuits.Circuit
+using QuantumCircuits.QCircuits.Gates: ParameterT
+using QuantumCircuits.QCircuits.Circuit: getparameters, getRandParameters
+using QuantumCircuits.QCircuits.QBase: setparameters!, bindparameters!
 
-export QuantumCircuit, QuantumDevice, QuantumGate, add!, QCircuit,
-       QuantumRegister, ClassicalRegister, tomatrix, decompose, simplify
+export ParameterT, getparameters, getRandParameters, setparameters!,
+       bindparameters!
 
 end # module

@@ -10,17 +10,10 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-module QuantumCircuits
-
-include("QCircuits/QCircuits.jl")
-include("QML/QML.jl")
-include("Execute/Execute.jl")
-
-using QuantumCircuits.QCircuits.QBase
-using QuantumCircuits.QCircuits.Registers
-using QuantumCircuits.QCircuits.Circuit
-
-export QuantumCircuit, QuantumDevice, QuantumGate, add!, QCircuit,
-       QuantumRegister, ClassicalRegister, tomatrix, decompose, simplify
-
-end # module
+include("RegistersTest.jl")
+include("CircuitTest.jl")
+include("InstructionsTest.jl")
+include("CircuitSimplifyTest.jl")
+include("CircuitUnitaryTest.jl")
+include("GatesTest.jl")
+include("OtherGatesTest.jl")

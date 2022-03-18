@@ -2,3 +2,8 @@ name = "QuantumCircuits"
 uuid = "ad924a34-1f3f-4025-ae82-e16b6f8ddf61"
 authors = ["Rafał Pracht <rpracht@wp.pl>"]
 version = "0.1.0"
+
+[deps]
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
+Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
