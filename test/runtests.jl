@@ -20,3 +20,7 @@ end
 @testset "Execute       " begin
     include("Execute/ExecuteTest.jl")
 end
+
+@testset "QML           " begin
+    include("QML/QMLTest.jl")
+end

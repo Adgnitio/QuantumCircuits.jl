@@ -10,18 +10,7 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-"Quantum machine learning"
-module QML
 
-include("Optimization.jl")
-include("CircuitOptimization.jl")
-
-using QuantumCircuits.QCircuits.Gates: ParameterT
-using QuantumCircuits.QCircuits.Circuit: getparameters, getRandParameters
-using QuantumCircuits.QCircuits.QBase: setparameters!, bindparameters!
-using QuantumCircuits.QML.CircuitOptimization
-
-export ParameterT, getparameters, getRandParameters, setparameters!,
-       bindparameters!, findparam
-
-end # module
+include("BaseOptimizationTest.jl")
+include("SingularOptTest.jl")
+include("CircOptTest.jl")

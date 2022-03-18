@@ -18,20 +18,9 @@ using QuantumCircuits.Execute: _0,  _1, qjacobian
 using QuantumCircuits.QCircuits.Math
 using QuantumCircuits.QCircuits.Circuit: toQiskit
 using QuantumCircuits.QCircuits.Circuit
-#using QuantumCircuits.QCircuits.Registers
 
 using Zygote
 using Zygote: jacobian
-
-# using QGen.Quantum.Execute
-# using QGen.Quantum.Qiskit
-# using QGen.Quantum.Gates
-# using QGen.Quantum.Circuit
-# using QGen.Quantum.Circuit: toQiskit
-# using QGen.Quantum.Math
-# using QGen.Quantum.Qiskit
-# using QGen.Quantum.Registers
-
 
 
 @test ket"0" == _0

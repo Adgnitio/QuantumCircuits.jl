@@ -17,13 +17,6 @@ using QuantumCircuits.QML
 using QuantumCircuits.QCircuits.Gates: appendparams!, ParamT, appendRandParams!,
                                        U3
 
-# using QGen.Quantum.QBase
-# using QGen.Quantum.Gates
-# using QGen.Quantum.Registers
-# using QGen.Quantum.Circuit
-# using QGen.Quantum.Gates: appendparams!, ParamT, ParameterT, appendRandParams!,
-#                           setparameters!
-
 function getparam(g)
     param = ParamT[]
     appendparams!(param, g)
