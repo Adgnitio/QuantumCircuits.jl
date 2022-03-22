@@ -32,7 +32,7 @@ IS_QISKIT = false
 function __init__()
     try
         copy!(qiskit, pyimport("qiskit"))
-        #copy!(plt, pyimport("matplotlib.pyplot"))
+        copy!(plt, pyimport("matplotlib.pyplot"))
 
         # imports
         pyimport("qiskit.ignis")
@@ -41,7 +41,7 @@ function __init__()
         global IS_QISKIT = true
     catch e
         println(e)
-        println("ERROR: QuantumCircuits need qiskit and qiskit.ignis python package.")
+        println("ERROR: QuantumCircuits need qiskit, qiskit.ignis and matplotlib python package.")
     end
 end
 
