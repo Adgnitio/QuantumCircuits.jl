@@ -23,6 +23,7 @@ using QuantumCircuits.QCircuits.Registers
 using QuantumCircuits.QCircuits.Qiskit
 using QuantumCircuits.QCircuits.Graph
 using QuantumCircuits.QCircuits.Math
+using QuantumCircuits.QCircuits.Qiskit: IS_QISKIT, NoQiskitError
 
 using LinearAlgebra: I
 
@@ -325,6 +326,10 @@ end
 
 "Function to convert QCircuit to Qiskit circuit"
 function toQiskit(circuit::QCircuit)
+    if !IS_QISKIT
+        throw(NoQiskitError("Unable to convert to Qiskit, qiskit is not installed."))
+    end
+
     if isempty(circuit.cRegisters)
         qc = QiskitCircuit(circuit.qRegisters, nothing)
     else
@@ -344,7 +349,11 @@ end
 
 "Show method"
 function Base.show(io::IO, qc::QCircuit)
-    print(io, toQiskit(qc))
+    if IS_QISKIT
+        print(io, toQiskit(qc))
+    else
+        print(io, "QCircuit")
+    end
 end
 
 "Convert circuit to string"

@@ -27,14 +27,27 @@ export QiskitSimulator, QiskitCircuit, getQRegister
 
 const qiskit = PyNULL() # pyimport("qiskit")
 const plt = PyNULL()
+IS_QISKIT = false
 
 function __init__()
-    copy!(qiskit, pyimport("qiskit"))
-    copy!(plt, pyimport("matplotlib.pyplot"))
+    try
+        copy!(qiskit, pyimport("qiskit"))
+        #copy!(plt, pyimport("matplotlib.pyplot"))
 
-    # imports
-    pyimport("qiskit.ignis")
-    pyimport("qiskit.ignis.verification")
+        # imports
+        pyimport("qiskit.ignis")
+        pyimport("qiskit.ignis.verification")
+
+        global IS_QISKIT = true
+    catch e
+        println(e)
+        println("ERROR: QuantumCircuits need qiskit and qiskit.ignis python package.")
+    end
+end
+
+"The error throw when there is no qiskit instaled."
+struct NoQiskitError <:Exception
+    msg::String
 end
 
 "Quantum device provided by Qiskit."
