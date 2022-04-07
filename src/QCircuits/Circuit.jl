@@ -38,7 +38,7 @@ const nop = () -> nothing
 
 "Quantum circuit."
 mutable struct QCircuit <: QuantumCircuit
-    qubits::Integer
+    qubits::Int
     qRegisters::Vector{QuantumRegister}
     cRegisters::Vector{ClassicalRegister}
     dcg::DirectedGraph
