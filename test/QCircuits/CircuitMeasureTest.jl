@@ -10,11 +10,21 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-include("RegistersTest.jl")
-include("CircuitTest.jl")
-include("InstructionsTest.jl")
-include("CircuitSimplifyTest.jl")
-include("CircuitUnitaryTest.jl")
-include("GatesTest.jl")
-include("OtherGatesTest.jl")
-include("CircuitMeasureTest.jl")
+using Test
+
+using QuantumCircuits
+using QuantumCircuits.Execute
+
+qc1 = QCircuit(4)
+qc1.x(2)
+qc1.h(1)
+qc1.cx(3, 2)
+qc1.measure([1,2,3], [1,2,3])
+
+qc2 = QCircuit(4)
+qc2.x(2)
+qc2.h(1)
+qc2.cx(3, 2)
+qc2.measure(1:3, 1:3)
+
+@test qc1 == qc2
