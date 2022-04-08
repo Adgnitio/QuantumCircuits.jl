@@ -41,7 +41,7 @@ mutable struct QCircuit <: QuantumCircuit
     qubits::Int
     qRegisters::Vector{QuantumRegister}
     cRegisters::Vector{ClassicalRegister}
-    dcg::DirectedGraph
+    dcg::DirectedGraph{Int}
     has_code::Bool
     code::Vector{QuantumGate}
     vqubits::Vector{Qubit}
@@ -73,7 +73,7 @@ mutable struct QCircuit <: QuantumCircuit
     function QCircuit(qRegs::Vector{QuantumRegister}, cRegs::Vector{ClassicalRegister})
         n = sum([length(i) for i in qRegs])
 
-        qc = new(n, qRegs, cRegs, DirectedGraph(n), false, QuantumGate[], Qubit[], ClassicalRegister[], Pair{Qubit, Cbit}[], eye(2^n), nop)
+        qc = new(n, qRegs, cRegs, DirectedGraph{Int}(n), false, QuantumGate[], Qubit[], ClassicalRegister[], Pair{Qubit, Cbit}[], eye(2^n), nop)
 
         # assign the qregister to circuit
         for r in qRegs
