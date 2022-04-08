@@ -138,8 +138,8 @@ function getCode(c::QCircuit)
     end
 end
 
-Base.:(==)(c1::QCircuit, c2::QCircuit) = c1.qubits == c2.qubits && getCode(c1) == getCode(c2)
-Base.hash(c::QCircuit, h::UInt) = hash((c.qubits, getCode(code)), h)
+Base.:(==)(c1::QCircuit, c2::QCircuit) = c1.qubits == c2.qubits && getCode(c1) == getCode(c2) && c1.measures_matrix == c2.measures_matrix
+Base.hash(c::QCircuit, h::UInt) = hash((c.qubits, getCode(code), c.measures_matrix), h)
 
 "Add gate to circuit"
 function add!(qc::QCircuit, gate::QuantumGate)
@@ -167,13 +167,13 @@ function add!(qc::QCircuit, gate::Type{T}, qubit::Integer) where T <: QuantumGat
     nothing
 end
 function add!(qc::QCircuit, gate::Type{T}, qubits::Vector) where T <: QuantumGate
-    for qubit in qubits
-        add!(qc, gate, qubit)
+    for i in eachindex(qubits)
+        add!(qc, gate, qubits[i])
     end
 end
 function add!(qc::QCircuit, gate::Type{T}, qubits::QuantumRegister) where T <: QuantumGate
-    for qubit in qubits
-        add!(qc, gate, qubit)
+    for i in eachindex(qubits)
+        add!(qc, gate, qubits[i])
     end
 end
 function add!(qc::QCircuit, gate::Type{T}, qubit1::Qubit, qubit2::Qubit) where T <: QuantumGate
@@ -229,8 +229,8 @@ function add!(qc::QCircuit, gate::Type{T}, qubit::Integer, θ) where T <: Quantu
     nothing
 end
 function add!(qc::QCircuit, gate::Type{T}, qubits::Vector, θ) where T <: QuantumGate
-    for qubit in qubits
-        add!(qc, gate, qubit, θ)
+    for i in eachindex(qubits)
+        add!(qc, gate, qubits[i], θ)
     end
 end
 
@@ -249,19 +249,19 @@ function add!(qc::QCircuit, gate::Type{T}, qubit::Integer, θ, ϕ, λ) where T <
     nothing
 end
 function add!(qc::QCircuit, gate::Type{T}, qubits::QuantumRegister, θ, ϕ, λ) where T <: QuantumGate
-    for qubit in qubits
-        add!(qc, gate, qubit, ParameterT(θ), ParameterT(ϕ), ParameterT(λ))
+    for i in eachindex(qubits)
+        add!(qc, gate, qubits[i], ParameterT(θ), ParameterT(ϕ), ParameterT(λ))
     end
 end
 function add!(qc::QCircuit, gate::Type{T}, qubits::Vector, θ, ϕ, λ) where T <: QuantumGate
-    for qubit in qubits
-        add!(qc, gate, qubit, ParameterT(θ), ParameterT(ϕ), ParameterT(λ))
+    for i in eachindex(qubits)
+        add!(qc, gate, qubits[i], ParameterT(θ), ParameterT(ϕ), ParameterT(λ))
     end
 end
 
 function add!(qc::QCircuit, gates::Vector{T}) where T <: QuantumGate
-    for g in gates
-        add!(qc, g)
+    for i in eachindex(gates)
+        add!(qc, gates[i])
     end
     nothing
 end
@@ -281,11 +281,10 @@ function measure!(qc::QCircuit, qubit::Integer, cbit::Integer, setMatrix::Bool=t
 
     measure!(qc, qc.vqubits[qubit + 1], qc.vcbits[cbit + 1], setMatrix)
 end
-function measure!(qc::QCircuit, qubits::Vector{T}, cbits::Vector{T}) where T <: Integer
-    n = length(qubits)
-    @assert n == length(cbits) "The length of qubits and classical bits should be equal."
+function measure!(qc::QCircuit, qubits::AbstractVector{<:Integer}, cbits::AbstractVector{<:Integer})
+    @assert length(qubits) == length(cbits) "The length of qubits and classical bits should be equal."
 
-    for i in 1:n
+    for (i, j) in zip(eachindex(qubits), eachindex(cbits))
         measure!(qc, qubits[i], cbits[i], false)
     end
 

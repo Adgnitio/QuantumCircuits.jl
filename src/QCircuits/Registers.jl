@@ -21,7 +21,7 @@ export Bit, Qubit, Cbit, Register, ClassicalRegister, QuantumRegister,
 abstract type Bit end
 
 "The abstract register"
-abstract type Register end
+abstract type Register <: AbstractArray{Int, 1} end
 
 "Classical bit"
 mutable struct Cbit <: Bit
@@ -95,6 +95,12 @@ end
 
 "The size of register."
 Base.length(reg::Register) = length(reg.bits)
+
+"Size"
+Base.size(reg::Register) = (length(reg),)
+
+"Each index method"
+Base.eachindex(reg::Register) = 0:(length(reg)-1)
 
 "Get bit from register on given index."
 function Base.getindex(reg::Register, idx::Integer)
