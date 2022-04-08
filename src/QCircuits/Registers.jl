@@ -25,16 +25,16 @@ abstract type Register <: AbstractArray{Int, 1} end
 
 "Classical bit"
 mutable struct Cbit <: Bit
-    index::Union{Integer, Nothing}
-    regIndex::Integer
+    index::Union{Int, Nothing}
+    regIndex::Int
 
     Cbit(idx::Integer) = new(nothing, idx)
 end
 
 "Quantum bit"
 mutable struct Qubit <: Bit
-    index::Union{Integer, Nothing}
-    regIndex::Integer
+    index::Union{Int, Nothing}
+    regIndex::Int
 
     Qubit(idx::Integer) = new(nothing, idx)
 end

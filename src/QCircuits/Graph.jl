@@ -16,17 +16,14 @@ using QuantumCircuits.QCircuits.QBase
 using QuantumCircuits.QCircuits.Gates
 import QuantumCircuits.QCircuits.QBase: add!
 
-"Index type"
-const IndexT = Integer
-
 export DirectedGraph, to_vector
 
 #"Start node"
 #struct StartNode <: QuantumGate qubit::Integer end
 
 "Circuit direct graph structure"
-struct DirectedGraph
-    qubits::Integer
+struct DirectedGraph{IndexT<:Integer}
+    qubits::Int
     start_nodes::Vector{IndexT}
     end_nodes::Vector{IndexT}
     vertices::Vector{QuantumGate}
@@ -35,12 +32,13 @@ struct DirectedGraph
     #sources::Vector{QuantumGate}
     #targets::Vector{QuantumGate}
     in_edges::Vector{Set{IndexT}}
-    out_edges::Vector{Set{Pair{Integer, IndexT}}}
+    out_edges::Vector{Set{Pair{IndexT, IndexT}}}
 end
 
 "Create new empyt graph"
-function DirectedGraph(qubits::Integer)
-    g = DirectedGraph(qubits,
+function DirectedGraph{IndexT}(qubits::Int) where IndexT<:Integer
+    g = DirectedGraph{IndexT}(
+                      qubits,
                       zeros(IndexT, qubits),
                       zeros(IndexT, qubits),
                       QuantumGate[],
@@ -58,7 +56,7 @@ const StartEndNode = 0
 const qubitToLine(q) = q + 1
 
 "Add gate to circuit"
-function add!(g::DirectedGraph, gate::QuantumGate)
+function add!(g::DirectedGraph{IndexT}, gate::QuantumGate) where IndexT<:Integer
     qubits = getqubitsids(gate)
     @assert all([q < g.qubits for q in qubits]) "Qubits in gate $gate is out of DAG qubits range $(g.qubits)."
 
@@ -99,7 +97,7 @@ function add!(g::DirectedGraph, gate::QuantumGate)
     nothing
 end
 
-function to_vector(g::DirectedGraph)::Vector{QuantumGate}
+function to_vector(g::DirectedGraph{IndexT})::Vector{QuantumGate} where IndexT<:Integer
     gates = Set{IndexT}([x for x in 1:length(g.vertices)])
 
     lines = g.start_nodes[1:end]
