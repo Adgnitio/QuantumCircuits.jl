@@ -59,21 +59,25 @@ sqc = simplify(qc)
 ################################################################################
 #  Simplify - 2 gates                                                          #
 ################################################################################
-function test_simplify_gates(u3, args, gates)
+function test_simplify_gates(u3, args, gates, orGate=nothing)
     qc = QCircuit(1)
     add!(qc, u3, args...)
     sqc = simplify(qc)
     code = getCode(sqc)
     @test length(code) == length(gates)
     for (i, g) in enumerate(gates)
-        @test typeof(code[i]) == g
+        if orGate == nothing
+            @test typeof(code[i]) == g
+        else
+            @test typeof(code[i]) == g || typeof(code[i]) == orGate[i]
+        end
     end
 
     @test unitary_error(tomatrix(qc), tomatrix(sqc)) < 1e-8
 end
 
 test_simplify_gates(U3, (0, -π/2, π, π), [H, X])
-test_simplify_gates(U3, (0, π, 0, π/2), [Y, Sd])
+test_simplify_gates(U3, (0, π, 0, π/2), [Y, Sd], [Sd, X])
 test_simplify_gates(U3, (0, π, 0, 5π/4), [T, X])
 test_simplify_gates(U3, (0, π, 2π, 0), [Z, X])
 test_simplify_gates(U3, (0, 0, 2.3114387473071725, 2.400950233077517), [Sd])
