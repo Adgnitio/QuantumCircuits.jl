@@ -266,7 +266,7 @@ function add!(qc::QCircuit, gates::Vector{T}) where T <: QuantumGate
     nothing
 end
 
-"Add measuers to circuit"
+"Add measures to circuit"
 function measure!(qc::QCircuit, qubit::Qubit, cbit::Cbit, setMatrix::Bool=true)
     push!(qc.measures, qubit => cbit)
 
@@ -274,7 +274,8 @@ function measure!(qc::QCircuit, qubit::Qubit, cbit::Cbit, setMatrix::Bool=true)
         setMeasureMatrix!(qc)
     end
 end
-"Add measuers to circuit"
+
+"Add measures to circuit"
 function measure!(qc::QCircuit, qubit::Integer, cbit::Integer, setMatrix::Bool=true)
     @assert qubit < qc.qubits "Qubits $qubit is out of circuit qubits range $(qc.qubits)."
     @assert cbit < length(qc.vcbits) "Qubits $qubit is out of circuit qubits range $(length(qc.vcbits))."
@@ -292,15 +293,15 @@ function measure!(qc::QCircuit, qubits::AbstractVector{<:Integer}, cbits::Abstra
 end
 
 function setMeasureMatrix!(qc::QCircuit)
-    measuered = [(i-1, v) for (i, v) in enumerate(sort([getid(q)  for (q, c) in qc.measures]))]
-    measuered_qubits = length(measuered)
-    mes_matrix = zeros(2^measuered_qubits, 2^qc.qubits)
+    measured = [(i-1, v) for (i, v) in enumerate(sort([getid(q)  for (q, c) in qc.measures]))]
+    measured_qubits = length(measured)
+    mes_matrix = zeros(2^measured_qubits, 2^qc.qubits)
     for i in 0:(2^qc.qubits-1)
         bin = digits(i, base=2, pad=qc.qubits)
 
         # calculate new index
         ni = 0
-        for (idx, m) in measuered
+        for (idx, m) in measured
             if bin[m + 1] == 1
                 ni += 2^idx
             end
