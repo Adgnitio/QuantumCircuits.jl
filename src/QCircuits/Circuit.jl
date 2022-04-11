@@ -355,13 +355,6 @@ function Base.show(io::IO, qc::QCircuit)
     end
 end
 
-"Convert circuit to string"
-function toString(qc::QCircuit)
-    io = IOBuffer()
-    show(io, qc)
-    return String(take!(io))
-end
-
 "Function create new parameters vector"
 function getparameters(qc::QCircuit)
     params = ParamT[]
