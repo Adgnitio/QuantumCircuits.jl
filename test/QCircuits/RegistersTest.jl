@@ -13,7 +13,6 @@
 using Test
 
 using QuantumCircuits
-using QuantumCircuits.QCircuits.Circuit: toString
 
 ###############################################################
 qra = QuantumRegister(2, "a")
@@ -35,7 +34,7 @@ b_1: ─────┤ X ├┤ X ├
 c: 4/═══════════════
                     "
 
-@test exp == toString(qc)
+@test exp == string(qc)
 ###############################################################
 
 using QuantumCircuits.QCircuits.Gates
@@ -60,7 +59,7 @@ q_1: ┤ H ├┤ Z ├┤ X ├──■──┤ X ├
 c: 2/═════════════════════════
                               "
 
-@test exp == toString(qc)
+@test exp == string(qc)
 
 ###############################################################
 using QuantumCircuits.QCircuits.Registers
