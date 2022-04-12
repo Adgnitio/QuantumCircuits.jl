@@ -252,8 +252,8 @@ umatrix(β, γ, δ) = Rzmatrix(β) * Rymatrix(γ) * Rzmatrix(δ)
 const _0 = [1+0im; 0]
 const _1 = [0im; 1]
 
-const I0X0I = _0 * dagger(_0)
-const I1X1I = _1 * dagger(_1)
+const I0X0I = _0 * adjoint(_0)
+const I1X1I = _1 * adjoint(_1)
 
 # Gate matrixs
 const Xmatrix = round.(u3matrix(π, 0, π), digits=2)

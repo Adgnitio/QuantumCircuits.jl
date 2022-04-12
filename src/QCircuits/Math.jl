@@ -14,11 +14,8 @@ module Math
 
 using LinearAlgebra
 
-export dagger, unitary_error, matrix_norm, eye, observe_unitary_error,
+export unitary_error, matrix_norm, eye, observe_unitary_error,
        min_observe_unitary_error
-
-"The dagger => conj transpose"
-dagger(x) = transpose(conj(x))
 
 "Calculate the unitary matrix error"
 function unitary_error(exp_unit, mat_unit)
@@ -44,7 +41,7 @@ end
 
 "Calculate the matrix norm"
 function matrix_norm(mat)
-    return abs(tr(dagger(mat) * mat))
+    return abs(tr(adjoint(mat) * mat))
 end
 
 "Return the identity matrix."

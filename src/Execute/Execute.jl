@@ -71,7 +71,7 @@ end
 
 "Macro proces ket binary vector to quantum state"
 macro bra_str(s)
-    return dagger(str2state(s))
+    return adjoint(str2state(s))
 end
 
 "Method convert state to probability"
