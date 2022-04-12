@@ -69,7 +69,7 @@ function appendparams!(param, gate::TwoQubitsRotationGate)
     push!(param, gate.θ)
 end
 
-appendRandParams!(param, gate::TwoQubitsRotationGate) = append!(param, rand(1) * 2π)
+appendRandParams!(param, ::TwoQubitsRotationGate) = append!(param, rand(1) * 2π)
 
 Base.length(gate::TwoQubitsRotationGate) = 1
 

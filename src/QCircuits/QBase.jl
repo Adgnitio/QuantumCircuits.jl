@@ -30,18 +30,18 @@ abstract type QuantumDevice end
 
 
 "The quantum gates"
-add!(qc::QuantumCircuit, gate::QuantumGate) = error("Please implement add! function used to adding gate to circuit for ", typeof(qc))
+add!(qc::QuantumCircuit, ::QuantumGate) = error("Please implement add! function used to adding gate to circuit for ", typeof(qc))
 
 "Get the matrix version of the quantum object."
 tomatrix(qc::QuantumObject) = error("Please implement tomatrix function for ", typeof(qc))
-tomatrix(qc::QuantumObject, params) = error("Please implement tomatrix with params function for ", typeof(qc))
+tomatrix(qc::QuantumObject, ::Any) = error("Please implement tomatrix with params function for ", typeof(qc))
 
 "Method return the error of standard gate"
 standardGateError(qc::QuantumObject) = error("Please implement standardGateError function for ", typeof(qc))
-standardGateError(qc::QuantumObject, params) = error("Please implement standardGateError with params function for ", typeof(qc))
+standardGateError(qc::QuantumObject, ::Any) = error("Please implement standardGateError with params function for ", typeof(qc))
 
 "Set the parameters to the quantum object"
-setparameters!(qc::QuantumObject, params) = error("Please implement setparameters! function for ", typeof(qc))
+setparameters!(qc::QuantumObject, ::Any) = error("Please implement setparameters! function for ", typeof(qc))
 
 "Bind the parameters to the quantum object"
 bindparameters!(qc::QuantumObject) = error("Please implement bindparameters! function for ", typeof(qc))

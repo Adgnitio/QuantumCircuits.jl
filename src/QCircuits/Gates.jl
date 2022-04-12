@@ -162,7 +162,7 @@ Base.show(io::IO, g::U3) = print(io, "U3($(g.qubit), $(g.θ), $(g.ϕ), $(g.λ))"
 Base.:(==)(g1::U3, g2::U3) = g1.qubit == g2.qubit && g1.θ == g2.θ && g1.ϕ == g2.ϕ && g1.λ == g2.λ
 Base.hash(g::U3, h::UInt) = hash((g.qubit, g.θ, g.ϕ, g.λ), h)
 
-bindparameters!(gate::QuantumGate) = nothing
+bindparameters!(::QuantumGate) = nothing
 bindparameters!(gate::RotationGate) = gate.θ = getvalue(gate.θ)
 function bindparameters!(gate::U3)
     gate.θ = getvalue(gate.θ)
@@ -198,7 +198,7 @@ function setparameter!(param::ParameterT, params, i)
     param.value = params[i]
     return i + 1
 end
-setparameter!(param::ParamT, params, i) = i
+setparameter!(::ParamT, ::Any, i) = i
 
 function setparameters!(gate::U3, params)
     @assert length(params) == length(gate) "U3 has $(length(gate)) parameters but $(length(params)) was provided."
@@ -268,16 +268,16 @@ const Tdmatrix = u1matrix(-π/4)
 const CX0matrix = [1.0 + 0im 0 0 0; 0 0 0 1; 0 0 1 0; 0 1 0 0]
 const CX1matrix = [1.0 + 0im 0 0 0; 0 1 0 0; 0 0 0 1; 0 0 1 0]
 
-tomatrix(gate::X) = Xmatrix
-tomatrix(gate::Y) = Ymatrix
-tomatrix(gate::Z) = Zmatrix
-tomatrix(gate::S) = Smatrix
-tomatrix(gate::Sd) = Sdmatrix
-tomatrix(gate::T) = Tmatrix
-tomatrix(gate::Td) = Tdmatrix
-tomatrix(gate::H) = Hmatrix
+tomatrix(::X) = Xmatrix
+tomatrix(::Y) = Ymatrix
+tomatrix(::Z) = Zmatrix
+tomatrix(::S) = Smatrix
+tomatrix(::Sd) = Sdmatrix
+tomatrix(::T) = Tmatrix
+tomatrix(::Td) = Tdmatrix
+tomatrix(::H) = Hmatrix
 tomatrix(gate::U3) = u3matrix(getvalue(gate.θ), getvalue(gate.ϕ), getvalue(gate.λ))
-function tomatrix(gate::U3, param)
+function tomatrix(::U3, param)
     @assert length(param) == 3 "U3 has 3 parameters but $(length(param)) was provided."
     u3matrix(param[1], param[2], param[3])
 end
@@ -285,21 +285,21 @@ end
 tomatrix(gate::Rx) = Rxmatrix(getvalue(gate.θ))
 tomatrix(gate::Ry) = Rymatrix(getvalue(gate.θ))
 tomatrix(gate::Rz) = Rzmatrix(getvalue(gate.θ))
-function tomatrix(gate::Rx, param)
+function tomatrix(::Rx, param)
     @assert length(param) == 1 "Rx has 1 parameters but $(length(param)) was provided."
     Rxmatrix(param[1])
 end
-function tomatrix(gate::Ry, param)
+function tomatrix(::Ry, param)
     @assert length(param) == 1 "Ry has 1 parameters but $(length(param)) was provided."
     Rymatrix(param[1])
 end
-function tomatrix(gate::Rz, param)
+function tomatrix(::Rz, param)
     @assert length(param) == 1 "Rz has 1 parameters but $(length(param)) was provided."
     Rzmatrix(param[1])
 end
 
 tomatrix(gate::U) = umatrix(gate.β, gate.γ, gate.δ)
-function tomatrix(gate::U, param)
+function tomatrix(::U, param)
     @assert length(param) == 3 "U has 3 parameters but $(length(param)) was provided."
     umatrix(param[1], param[2], param[3])
 end
@@ -397,9 +397,9 @@ function standardGateError(gate::UniversalGate, params=nothing)
 end
 
 
-appendparams!(param, gate) = nothing
+appendparams!(::Any, ::Any) = nothing
 appendparams!(param, value::ParameterT) = push!(param, value.value)
-appendparams!(param, value::ParamT) = nothing
+appendparams!(::Any, ::ParamT) = nothing
 function appendparams!(param, gate::U3)
     appendparams!(param, gate.θ)
     appendparams!(param, gate.ϕ)
@@ -413,16 +413,16 @@ function appendparams!(param, gate::U)
     nothing
 end
 
-appendRandParams!(param, value::ParameterT) = append!(param, rand(1) * 2π)
-appendRandParams!(param, value::ParamT) = nothing
-appendRandParams!(param, gate) = nothing
+appendRandParams!(param, ::ParameterT) = append!(param, rand(1) * 2π)
+appendRandParams!(::Any, value::ParamT) = nothing
+appendRandParams!(::Any, gate) = nothing
 function appendRandParams!(param, gate::U3)
     appendRandParams!(param, gate.θ)
     appendRandParams!(param, gate.ϕ)
     appendRandParams!(param, gate.λ)
     nothing
 end
-appendRandParams!(param, gate::U) = append!(param, rand(3) * 2π)
+appendRandParams!(param, ::U) = append!(param, rand(3) * 2π)
 
 
 getlength(value::ParameterT) = 1

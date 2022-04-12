@@ -134,7 +134,7 @@ addQiskitCode(qc::QiskitCircuit, gate::Rx) = qc.qc.rx(getvalue(gate.θ), qc.qubi
 addQiskitCode(qc::QiskitCircuit, gate::Ry) = qc.qc.ry(getvalue(gate.θ), qc.qubits[gate.qubit])
 addQiskitCode(qc::QiskitCircuit, gate::Rz) = qc.qc.rz(getvalue(gate.θ), qc.qubits[gate.qubit])
 addQiskitCode(qc::QiskitCircuit, gate::Rzx) = qc.qc.rzx(getvalue(gate.θ), qc.qubits[gate.qubit1], qc.qubits[gate.qubit2])
-addQiskitCode(qc::QiskitCircuit, gate::Barrier) = qc.qc.barrier()
+addQiskitCode(qc::QiskitCircuit, ::Barrier) = qc.qc.barrier()
 function addQiskitCode(qc::QiskitCircuit, gate::U)
     qc.qc.rz(gate.β, qc.qubits[gate.qubit])
     qc.qc.ry(gate.γ, qc.qubits[gate.qubit])
