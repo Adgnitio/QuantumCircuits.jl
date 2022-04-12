@@ -22,8 +22,7 @@ dagger(x) = transpose(conj(x))
 
 "Calculate the unitary matrix error"
 function unitary_error(exp_unit, mat_unit)
-    dif = exp_unit - mat_unit
-    return matrix_norm(dif)
+    sum(((a,b),) -> abs2(a - b), zip(exp_unit, mat_unit))
 end
 
 "Calculate the observe unitary matrix error, the error which we can obserwe
