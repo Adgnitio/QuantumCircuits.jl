@@ -25,7 +25,7 @@ using QuantumCircuits.QCircuits.Graph
 using QuantumCircuits.QCircuits.Math
 using QuantumCircuits.QCircuits.Qiskit: IS_QISKIT, NoQiskitError
 
-using LinearAlgebra: I
+using LinearAlgebra
 
 import QuantumCircuits.QCircuits.QBase: add!, tomatrix, setparameters!, simplify,
        standardGateError, decompose, measure!, bindparameters!
@@ -399,7 +399,7 @@ end
 
 function tomatrix(qc::QCircuit, params=nothing)
     i = 1
-    unitary = I * (1.0 + 0im)
+    unitary = LinearAlgebra.I * (1.0 + 0im)
     for gate in getCode(qc)
         l = length(gate)
         if params != nothing && l > 0
