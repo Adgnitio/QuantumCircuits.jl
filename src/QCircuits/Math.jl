@@ -26,8 +26,8 @@ end
 from quantum state"
 function observe_unitary_error(exp_unit, mat_unit, index=1)
     # Remove phase
-    exp_unit = exp_unit[:] .* exp(-im * angle(exp_unit[index]))
-    mat_unit = mat_unit[:] .* exp(-im * angle(mat_unit[index]))
+    exp_unit = exp_unit[:] .* cis(-angle(exp_unit[index]))
+    mat_unit = mat_unit[:] .* cis(-angle(mat_unit[index]))
 
     return unitary_error(exp_unit, mat_unit)
 end

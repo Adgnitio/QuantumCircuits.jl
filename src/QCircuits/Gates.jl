@@ -234,8 +234,8 @@ toU3(gate::X) = U3(gate.qubit, π, 0, π)
 
 
 "Return the gate matrix"
-u3matrix(θ, ϕ, λ) = [cos(θ/2)+0im              -exp(1im * λ) * sin(θ/2);
-                     exp(1im * ϕ) * sin(θ/2)   exp(1im * λ + 1im * ϕ) * cos(θ/2)]
+u3matrix(θ, ϕ, λ) = [cos(θ/2)+0im              -cis(λ) * sin(θ/2);
+                     cis(ϕ) * sin(θ/2)   cis(λ + ϕ) * cos(θ/2)]
 u2matrix(ϕ, λ) = u3matrix(π/2, ϕ, λ)
 u1matrix(λ) = u3matrix(0, 0, λ)
 
@@ -244,7 +244,7 @@ Rxmatrix(θ) = [cos(θ/2)+0im -1im * sin(θ/2); -1im * sin(θ/2) cos(θ/2)]
 # u3matrix(θ, 0, 0)
 Rymatrix(θ) = [cos(θ/2)+0im -sin(θ/2); sin(θ/2) cos(θ/2)]
 # exp(-1im * θ/2) * u1matrix(θ)
-Rzmatrix(θ) = [exp(-1im * θ/2) 0; 0 exp(1im * θ/2)]
+Rzmatrix(θ) = [cis(-θ/2) 0; 0 cis(θ/2)]
 # Universary matrix
 umatrix(β, γ, δ) = Rzmatrix(β) * Rymatrix(γ) * Rzmatrix(δ)
 
