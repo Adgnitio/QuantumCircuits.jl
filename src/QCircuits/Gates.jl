@@ -40,7 +40,7 @@ const Parameter = Union{ParamT, ParameterT}
 
 getvalue(p::ParamT) = p
 function getvalue(p::ParameterT)
-    @assert p.value != nothing "Unable get unset parameter."
+    @assert !isnothing(p.value) "Unable get unset parameter."
     return p.value
 end
 
@@ -341,7 +341,7 @@ end
 
 function tomatrix(qubits::Integer, gate::QuantumGate, params=nothing)
     # get gate unitary
-    if params != nothing
+    if !isnothing(params)
         gate_unitary = tomatrix(gate, params)
     else
         gate_unitary = tomatrix(gate)
@@ -366,7 +366,7 @@ standardGateError(gate::QuantumGate, params=nothing) = 0.0
 
 function standardGateError(gate::UniversalGate, params=nothing)
     # get gate unitary
-    if params != nothing
+    if !isnothing(params)
         m = tomatrix(gate, params)
     else
         m = tomatrix(gate)
@@ -498,7 +498,7 @@ inv(gate::Sd) = S(gate.qubit)
 inv(gate::U3) = U3(gate.qubit, neg(gate.θ), neg(gate.λ), neg(gate.ϕ))
 
 function neg(p::ParameterT)
-    @assert p.value != nothing "Unable inv unset parameter."
+    @assert !isnothing(p.value) "Unable inv unset parameter."
     return ParameterT(-p.value)
 end
 neg(value::ParamT) = -value

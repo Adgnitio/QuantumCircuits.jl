@@ -196,7 +196,7 @@ function add!(qc::QCircuit, gate::Type{T}, qubit1::Qubit, qubit2::Qubit, params)
     @assert qubit1 in qc.vqubits "Qubits is out of circuit qubits range."
     @assert qubit2 in qc.vqubits "Qubits is out of circuit qubits range."
 
-    if params == nothing
+    if isnothing(params)
         add!(qc.dcg, gate(qubit1, qubit2))
     else
         add!(qc.dcg, gate(qubit1, qubit2, params))
@@ -402,7 +402,7 @@ function tomatrix(qc::QCircuit, params=nothing)
     unitary = LinearAlgebra.I * (1.0 + 0im)
     for gate in getCode(qc)
         l = length(gate)
-        if params != nothing && l > 0
+        if !isnothing(params) && l > 0
             @views gate_unitary = tomatrix(qc.qubits, gate, params[i:(i+l-1)])
             # TODO gate_unitary = tomatrix(qc.qubits, gate, params[i:(i+l-1)])
             i = i + l
@@ -424,7 +424,7 @@ function standardGateError(qc::QCircuit, params=nothing)
     i = 1
     for gate in getCode(qc)
         l = length(gate)
-        if params != nothing && l > 0
+        if !isnothing(params) && l > 0
             @views gerr = standardGateError(gate, params[i:(i+l-1)])
             i = i + l
         else

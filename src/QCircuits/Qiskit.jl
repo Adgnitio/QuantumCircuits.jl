@@ -79,7 +79,7 @@ mutable struct QiskitCircuit <: QuantumCircuit
             push!(qRegs, r.name => r)
         end
 
-        if cRegs != nothing
+        if !isnothing(cRegs)
             cregs = [qiskit.ClassicalRegister(length(r.bits), r.name) for r in cRegs]
 
             cbits = Dict{Cbit, PyObject}()

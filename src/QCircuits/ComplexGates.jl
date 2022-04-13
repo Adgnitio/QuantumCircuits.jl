@@ -44,7 +44,7 @@ Base.show(io::IO, gate::U4) = print(io, "U4($(gate.qubit1), $(gate.qubit2))")
 
 function appendparams!(param, gate::U4)
     for p in gate.params
-        @assert p != nothing "Unable to append param without set it first."
+        @assert !isnothing(p) "Unable to append param without set it first."
         appendparams!(param, p)
     end
 end
