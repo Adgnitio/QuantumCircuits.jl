@@ -47,7 +47,7 @@ const qubit_map = Dict('0' => _0, '1' => _1)
 #const _00 = kron(_0, _0)
 
 function str2state(s)
-    @assert all([c in ('0', '1') for c in s]) "Only 0 and 1 are allowed."
+    @assert all(c in ('0', '1') for c in s) "Only 0 and 1 are allowed."
 
     # Reverse the bit order
     s = reverse(s)
