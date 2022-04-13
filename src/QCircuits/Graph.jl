@@ -58,7 +58,7 @@ const qubitToLine(q) = q + 1
 "Add gate to circuit"
 function add!(g::DirectedGraph{IndexT}, gate::QuantumGate) where IndexT<:Integer
     qubits = getqubitsids(gate)
-    @assert all([q < g.qubits for q in qubits]) "Qubits in gate $gate is out of DAG qubits range $(g.qubits)."
+    @assert all(q < g.qubits for q in qubits) "Qubits in gate $gate is out of DAG qubits range $(g.qubits)."
 
     @assert length(g.vertices) == length(g.in_edges) "Inexpected inconsistency between length of vertices and in edges"
     @assert length(g.vertices) == length(g.out_edges) "Inexpected inconsistency between length of vertices and out edges"

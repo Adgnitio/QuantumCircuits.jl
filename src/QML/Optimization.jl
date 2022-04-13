@@ -254,7 +254,7 @@ function gradientDescent(of::OptimizationFunction, x; α=0.001, maxItr=nothing, 
         # Check if we have solution
         # check val if the zero is expected
         # @show all(abs.(dval) .< ϵ), any([isnan(p) for p in x]), (isExpectedZero && val < ϵ)
-        if all(abs.(dval) .< ϵ) || any([isnan(p) for p in x]) || (isExpectedZero && val < ϵ)
+        if all(abs.(dval) .< ϵ) || any(isnan(p) for p in x) || (isExpectedZero && val < ϵ)
             process = false
         end
         if diffx < 2*ϵ && itr > 2000
