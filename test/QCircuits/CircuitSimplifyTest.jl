@@ -76,7 +76,7 @@ function test_simplify_gates(u3, args, gates, orGate=nothing)
     @test unitary_error(tomatrix(qc), tomatrix(sqc)) < 1e-8
 end
 
-test_simplify_gates(U3, (0, -π/2, π, π), [H, X])
+test_simplify_gates(U3, (0, -π/2, π, π), [H, X], [Z, H])
 test_simplify_gates(U3, (0, π, 0, π/2), [Y, Sd], [Sd, X])
 test_simplify_gates(U3, (0, π, 0, 5π/4), [T, X])
 test_simplify_gates(U3, (0, π, 2π, 0), [Z, X])
