@@ -21,7 +21,7 @@ export Bit, Qubit, Cbit, Register, ClassicalRegister, QuantumRegister,
 abstract type Bit end
 
 "The abstract register"
-abstract type Register <: AbstractArray{Int, 1} end
+abstract type Register <: AbstractVector{Int} end
 
 "Classical bit"
 mutable struct Cbit <: Bit
