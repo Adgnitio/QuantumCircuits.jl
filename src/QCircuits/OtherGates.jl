@@ -65,7 +65,7 @@ getqubitsids(gate::TwoQubitsRotationGate) = (getid(gate.qubit1), getid(gate.qubi
 Base.show(io::IO, gate::TwoQubitsRotationGate) = print(io, "$(typeof(gate))($(gate.qubit1), $(gate.qubit2), $(gate.θ))")
 
 function appendparams!(param, gate::TwoQubitsRotationGate)
-    @assert gate.θ != nothing "Unable to append param without set it first."
+    @assert !isnothing(gate.θ) "Unable to append param without set it first."
     push!(param, gate.θ)
 end
 
@@ -75,12 +75,12 @@ Base.length(gate::TwoQubitsRotationGate) = 1
 
 function setparameters!(gate::TwoQubitsRotationGate, params)
     @assert length(params) == 1 "Rzx has 1 parameters but $(length(param)) was provided."
-    @assert params[1] != nothing "Unable to set nothing as parameters"
+    @assert !isnothing(params[1]) "Unable to set nothing as parameters"
     gate.θ = params[1]
 end
 
 function tomatrix(g::Rzx, param=nothing)
-    if param == nothing
+    if isnothing(param)
         θ = g.θ
     else
         @assert length(param) == 1 "Rzx has 1 parameters but $(length(param)) was provided."

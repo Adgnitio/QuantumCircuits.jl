@@ -40,7 +40,7 @@ mutable struct Qubit <: Bit
 end
 
 function Base.show(io::IO, q::Qubit)
-    if q.index == nothing
+    if isnothing(q.index)
         print(io, "$(q.regIndex)")
     else
         print(io, "$(q.index)")
@@ -48,14 +48,14 @@ function Base.show(io::IO, q::Qubit)
 end
 
 function Base.:(==)(q1::Qubit, q2::Qubit)
-    @assert q1.index != nothing "Unable compare un assigned register."
-    @assert q2.index != nothing "Unable compare un assigned register."
+    @assert !isnothing(q1.index) "Unable compare un assigned register."
+    @assert !isnothing(q2.index) "Unable compare un assigned register."
 
     return q1.index == q2.index
 end
 
 function Base.hash(q::Qubit, h::UInt)
-    @assert q.index != nothing "Unable compare un assigned register."
+    @assert !isnothing(q.index) "Unable compare un assigned register."
 
     return hash(q.index, h)
 end
@@ -63,13 +63,13 @@ end
 
 "Get bit index"
 function getid(b::Bit)
-    @assert b.index != nothing "The bit is not assigned to circuit."
+    @assert !isnothing(b.index) "The bit is not assigned to circuit."
 
     return b.index
 end
 "Get bit index"
 function setid(b::Bit, id::Integer)
-    @assert b.index == nothing "Unbale to assig bit to circuit twice."
+    @assert isnothing(b.index) "Unbale to assig bit to circuit twice."
 
     b.index = id
 end

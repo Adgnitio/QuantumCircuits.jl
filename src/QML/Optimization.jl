@@ -241,7 +241,7 @@ function gradientDescent(of::OptimizationFunction, x; α=0.001, maxItr=nothing, 
         #println("val: $val, x[1]: $(x[1]), dval[1]: $(dval[1])")
         # do update
         debug && println("Start iteration $itr, value: $val, best: $best_val, dval: $(maximum(abs.(dval)))")
-        debug && checkFn != nothing && println("Real value: $(checkFn(x))")
+        debug && !isnothing(checkFn) && println("Real value: $(checkFn(x))")
         H, α, diffx = opt(x, val, dval, argsArePeriodic=argsArePeriodic, debug=debug, useBigValInc=useBigValInc)
         # for i in 1:length(x)
         #     x[i] = x[i] - α * dval[i]
@@ -264,7 +264,7 @@ function gradientDescent(of::OptimizationFunction, x; α=0.001, maxItr=nothing, 
 
         # Check the iterate count
         itr += 1
-        if maxItr != nothing && itr > maxItr
+        if !isnothing(maxItr) && itr > maxItr
             process = false
         end
     end

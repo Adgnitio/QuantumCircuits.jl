@@ -66,7 +66,7 @@ function test_simplify_gates(u3, args, gates, orGate=nothing)
     code = getCode(sqc)
     @test length(code) == length(gates)
     for (i, g) in enumerate(gates)
-        if orGate == nothing
+        if isnothing(orGate)
             @test typeof(code[i]) == g
         else
             @test typeof(code[i]) == g || typeof(code[i]) == orGate[i]

@@ -83,7 +83,7 @@ function execute(::QuantumSimulator, qc::QCircuit, params=nothing; prev_matrix=n
     s = vcat([1], zeros(2^qc.qubits-1))
 
     m = tomatrix(qc, params)
-    if prev_matrix != nothing
+    if !isnothing(prev_matrix)
         s = prev_matrix * s
     end
 

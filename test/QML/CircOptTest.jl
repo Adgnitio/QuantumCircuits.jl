@@ -27,7 +27,7 @@ function test_findparam(n, expqc, params=nothing)
     for i in 0:(n-1)
         qc.u3(i)
     end
-    if params != nothing
+    if !isnothing(params)
         setparameters!(qc, params)
     end
     params = getparameters(qc)
