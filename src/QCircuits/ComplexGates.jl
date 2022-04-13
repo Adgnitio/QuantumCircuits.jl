@@ -62,7 +62,7 @@ end
 
 appendRandParams!(param, gate::U4) = append!(param, rand(U4_params) * 2π)
 
-Base.length(gate::U4) = U4_params
+Base.length(::U4) = U4_params
 
 function setparameters!(gate::U4, params)
     @assert length(params) == U4_params "U4 has $(U4_params) parameters but $(length(param)) was provided."

@@ -36,12 +36,12 @@ end
 getArgs(g::Barrier) = ((g.qubits, ), )
 
 "Return the qubits on which operate the gate"
-getqubits(gate::Barrier) = ([getid(qubit) for qubit in g.qubits]..., )
+getqubits(::Barrier) = ([getid(qubit) for qubit in g.qubits]..., )
 
 "Return the qubits ids on which operate the gate"
 getqubitsids(gate::Barrier) = [getid(qubit) for qubit in gate.qubits]
 
-Base.show(io::IO, gate::Barrier) = print(io, "Barrier")
+Base.show(io::IO, ::Barrier) = print(io, "Barrier")
 
 decompose(gate::Barrier) = [gate]
 

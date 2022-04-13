@@ -78,7 +78,7 @@ end
 state2probability(s) = abs.(s) .^ 2
 
 "Function execute the quantum circuit on simulator"
-function execute(device::QuantumSimulator, qc::QCircuit, params=nothing; prev_matrix=nothing)
+function execute(::QuantumSimulator, qc::QCircuit, params=nothing; prev_matrix=nothing)
     # The initial, all zeros vector
     s = vcat([1], zeros(2^qc.qubits-1))
 
