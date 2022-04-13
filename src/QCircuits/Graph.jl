@@ -18,9 +18,6 @@ import QuantumCircuits.QCircuits.QBase: add!
 
 export DirectedGraph, to_vector
 
-#"Start node"
-#struct StartNode <: QuantumGate qubit::Integer end
-
 "Circuit direct graph structure"
 struct DirectedGraph{IndexT<:Integer}
     qubits::Int
