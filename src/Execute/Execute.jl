@@ -185,7 +185,7 @@ end
 ######################################################
 
 "Set the parameters to the cicquit and convert to qiskit"
-function setAndConvert(qc, params::Vector{T}) where T <: ParamT
+function setAndConvert(qc, params::Vector{<:ParamT}) 
     setparameters!(qc, params)
     return toQiskit(qc)
 end
@@ -199,7 +199,7 @@ function getShift(n, idx)
 end
 
 "Caclulate the jacobian on device."
-function qjacobian(backend, qc, params::Vector{T}, runN=1, corrMes=true) where T <: ParamT
+function qjacobian(backend, qc, params::Vector{<:ParamT}, runN=1, corrMes=true)
     @assert (length(params) * runN * 2 + runN) < 300 "To mamny run."
     circuits = QiskitCircuit[]
 
@@ -270,14 +270,14 @@ function qjacobian(backend, qc, params::Vector{T}, runN=1, corrMes=true) where T
 end
 
 "Caclulate loss value and it derivateive"
-function qderivative(backend, qc, loss, params::Vector{T}, runN=1) where T <: ParamT
+function qderivative(backend, qc, loss, params::Vector{<:ParamT}, runN=1)
     y, jak = qjacobian(backend, qc, params, runN)
     der = transpose(jak) * loss'(y)
     return loss(y), der
 end
 
 "Caclulate the the value."
-function qexecute(backend, qc, loss, params::Vector{T}, runN=1, corrMes=true) where T <: ParamT
+function qexecute(backend, qc, loss, params::Vector{<:ParamT}, runN=1, corrMes=true)
 
     # set the parameters
     setparameters!(qc, params)

@@ -147,36 +147,36 @@ function add!(qc::QCircuit, gate::QuantumGate)
     qc.has_code = false
     nothing
 end
-function add!(qc::QCircuit, gate::Type{T}, qubit::Qubit) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit::Qubit)
     @assert qubit in qc.vqubits "Qubits is out of circuit qubits range."
 
     add!(qc.dcg, gate(qubit))
     qc.has_code = false
     nothing
 end
-function add!(qc::QCircuit, gate::Type{T}, args::Tuple) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, args::Tuple)
     add!(qc.dcg, gate(args...))
     qc.has_code = false
     nothing
 end
-function add!(qc::QCircuit, gate::Type{T}, qubit::Integer) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit::Integer)
     @assert qubit < qc.qubits "Qubits $qubit is out of circuit qubits range $(qc.qubits)."
 
     add!(qc, gate, qc.vqubits[qubit + 1])
 
     nothing
 end
-function add!(qc::QCircuit, gate::Type{T}, qubits::Vector) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::Vector)
     for i in eachindex(qubits)
         add!(qc, gate, qubits[i])
     end
 end
-function add!(qc::QCircuit, gate::Type{T}, qubits::QuantumRegister) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::QuantumRegister)
     for i in eachindex(qubits)
         add!(qc, gate, qubits[i])
     end
 end
-function add!(qc::QCircuit, gate::Type{T}, qubit1::Qubit, qubit2::Qubit) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Qubit, qubit2::Qubit)
     @assert qubit1 in qc.vqubits "Qubits is out of circuit qubits range."
     @assert qubit2 in qc.vqubits "Qubits is out of circuit qubits range."
 
@@ -184,7 +184,7 @@ function add!(qc::QCircuit, gate::Type{T}, qubit1::Qubit, qubit2::Qubit) where T
     qc.has_code = false
     nothing
 end
-function add!(qc::QCircuit, gate::Type{T}, qubit1::Integer, qubit2::Integer) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Integer, qubit2::Integer)
     @assert qubit1 < qc.qubits "Qubits $qubit1 is out of circuit qubits range $(qc.qubits)."
     @assert qubit2 < qc.qubits "Qubits $qubit2 is out of circuit qubits range $(qc.qubits)."
 
@@ -192,7 +192,7 @@ function add!(qc::QCircuit, gate::Type{T}, qubit1::Integer, qubit2::Integer) whe
 
     nothing
 end
-function add!(qc::QCircuit, gate::Type{T}, qubit1::Qubit, qubit2::Qubit, params) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Qubit, qubit2::Qubit, params)
     @assert qubit1 in qc.vqubits "Qubits is out of circuit qubits range."
     @assert qubit2 in qc.vqubits "Qubits is out of circuit qubits range."
 
@@ -204,7 +204,7 @@ function add!(qc::QCircuit, gate::Type{T}, qubit1::Qubit, qubit2::Qubit, params)
     qc.has_code = false
     nothing
 end
-function add!(qc::QCircuit, gate::Type{T}, qubit1::Integer, qubit2::Integer, params) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Integer, qubit2::Integer, params)
     @assert qubit1 < qc.qubits "Qubits $qubit1 is out of circuit qubits range $(qc.qubits)."
     @assert qubit2 < qc.qubits "Qubits $qubit2 is out of circuit qubits range $(qc.qubits)."
 
@@ -214,52 +214,52 @@ function add!(qc::QCircuit, gate::Type{T}, qubit1::Integer, qubit2::Integer, par
 end
 
 
-function add!(qc::QCircuit, gate::Type{T}, qubit::Qubit, θ) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit::Qubit, θ)
     @assert qubit in qc.vqubits "Qubits is out of circuit qubits range."
 
     add!(qc.dcg, gate(qubit, θ))
     qc.has_code = false
     nothing
 end
-function add!(qc::QCircuit, gate::Type{T}, qubit::Integer, θ) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit::Integer, θ)
     @assert qubit < qc.qubits "Qubits $qubit is out of circuit qubits range $(qc.qubits)."
 
     add!(qc, gate, qc.vqubits[qubit + 1], θ)
 
     nothing
 end
-function add!(qc::QCircuit, gate::Type{T}, qubits::Vector, θ) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::Vector, θ)
     for i in eachindex(qubits)
         add!(qc, gate, qubits[i], θ)
     end
 end
 
-function add!(qc::QCircuit, gate::Type{T}, qubit::Qubit, θ, ϕ, λ) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit::Qubit, θ, ϕ, λ)
     @assert qubit in qc.vqubits "Qubits is out of circuit qubits range."
 
     add!(qc.dcg, gate(qubit, θ, ϕ, λ))
     qc.has_code = false
     nothing
 end
-function add!(qc::QCircuit, gate::Type{T}, qubit::Integer, θ, ϕ, λ) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit::Integer, θ, ϕ, λ)
     @assert qubit < qc.qubits "Qubits $qubit is out of circuit qubits range $(qc.qubits)."
 
     add!(qc, gate, qc.vqubits[qubit + 1], θ, ϕ, λ)
 
     nothing
 end
-function add!(qc::QCircuit, gate::Type{T}, qubits::QuantumRegister, θ, ϕ, λ) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::QuantumRegister, θ, ϕ, λ)
     for i in eachindex(qubits)
         add!(qc, gate, qubits[i], ParameterT(θ), ParameterT(ϕ), ParameterT(λ))
     end
 end
-function add!(qc::QCircuit, gate::Type{T}, qubits::Vector, θ, ϕ, λ) where T <: QuantumGate
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::Vector, θ, ϕ, λ)
     for i in eachindex(qubits)
         add!(qc, gate, qubits[i], ParameterT(θ), ParameterT(ϕ), ParameterT(λ))
     end
 end
 
-function add!(qc::QCircuit, gates::Vector{T}) where T <: QuantumGate
+function add!(qc::QCircuit, gates::Vector{<:QuantumGate})
     for i in eachindex(gates)
         add!(qc, gates[i])
     end
