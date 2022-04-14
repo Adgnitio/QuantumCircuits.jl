@@ -115,7 +115,7 @@ function draw(qc::QiskitCircuit)
 end
 
 "Function return the register"
-getQRegister(qc::QiskitCircuit, name::String) = qc.qRegs[name]
+getQRegister(qc::QiskitCircuit, name::AbstractString) = qc.qRegs[name]
 
 
 "Add quantum gate to Qiskit circuit"
