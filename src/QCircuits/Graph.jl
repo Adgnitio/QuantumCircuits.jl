@@ -109,7 +109,7 @@ function to_vector(g::DirectedGraph{IndexT})::Vector{QuantumGate} where IndexT<:
                 # remove vertice from gates
                 pop!(gates, l)
                 # Update lines
-                expected_qubits = Set([qubitToLine(n) for n in getqubitsids(g.vertices[l])])
+                expected_qubits = Set(qubitToLine(n) for n in getqubitsids(g.vertices[l]))
                 for (q, idx) in g.out_edges[l]
                     lines[q] = idx
                     pop!(expected_qubits, q)

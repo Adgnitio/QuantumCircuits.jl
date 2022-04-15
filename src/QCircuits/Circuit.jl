@@ -166,14 +166,9 @@ function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit::Integer)
 
     nothing
 end
-function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::Vector)
-    for i in eachindex(qubits)
-        add!(qc, gate, qubits[i])
-    end
-end
-function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::QuantumRegister)
-    for i in eachindex(qubits)
-        add!(qc, gate, qubits[i])
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::AbstractVector)
+    for qubit in qubits
+        add!(qc, gate, qubit)
     end
 end
 function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Qubit, qubit2::Qubit)
@@ -228,6 +223,7 @@ function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit::Integer, θ)
 
     nothing
 end
+
 function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::Vector, θ)
     for i in eachindex(qubits)
         add!(qc, gate, qubits[i], θ)
@@ -248,20 +244,14 @@ function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit::Integer, θ, ϕ, �
 
     nothing
 end
-function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::QuantumRegister, θ, ϕ, λ)
-    for i in eachindex(qubits)
-        add!(qc, gate, qubits[i], ParameterT(θ), ParameterT(ϕ), ParameterT(λ))
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::AbstractVector, θ, ϕ, λ) 
+    for qubit in qubits
+        add!(qc, gate, qubit, ParameterT(θ), ParameterT(ϕ), ParameterT(λ))
     end
 end
-function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::Vector, θ, ϕ, λ)
-    for i in eachindex(qubits)
-        add!(qc, gate, qubits[i], ParameterT(θ), ParameterT(ϕ), ParameterT(λ))
-    end
-end
-
 function add!(qc::QCircuit, gates::Vector{<:QuantumGate})
-    for i in eachindex(gates)
-        add!(qc, gates[i])
+    for g in gates
+        add!(qc, g)
     end
     nothing
 end
