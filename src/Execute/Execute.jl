@@ -42,26 +42,20 @@ QiskitQuantum() = QiskitQuantum(qiskit.providers.aer.QasmSimulator())
 const _0 = [1+0im; 0]
 const _1 = [0im; 1]
 
-const qubit_map = Dict('0' => _0, '1' => _1)
+function _ket(position::Integer, n_qubits::Integer)
+    # code from: https://github.com/jlapeyre/QMatrices.jl/blob/eb20d94a69775fb5d6867b0996ae634d3329a5a5/src/construction.jl#L40-L62
+    v = zeros(Int, 2^n_qubits)
+    v[position] = 1
+    return v
+end
 
-#const _00 = kron(_0, _0)
-
-function str2state(s)
+function str2state(s::AbstractString)
     @assert all(c in ('0', '1') for c in s) "Only 0 and 1 are allowed."
 
-    # Reverse the bit order
-    s = reverse(s)
-    state = qubit_map[s[1]]
-
-    if length(s) == 1
-        return state
-    end
-
-    for d in s[2:end]
-        state = kron(qubit_map[d], state)
-    end
-
-    return state
+    # code from: https://github.com/jlapeyre/QMatrices.jl/blob/eb20d94a69775fb5d6867b0996ae634d3329a5a5/src/construction.jl#L40-L62
+    pos = parse(Int, s, base=2) + 1
+    n_qubits = length(s)
+    return _ket(pos, n_qubits)
 end
 
 "Macro proces ket binary vector to quantum state"
@@ -185,7 +179,7 @@ end
 ######################################################
 
 "Set the parameters to the cicquit and convert to qiskit"
-function setAndConvert(qc, params::Vector{<:ParamT}) 
+function setAndConvert(qc, params::Vector{<:ParamT})
     setparameters!(qc, params)
     return toQiskit(qc)
 end
