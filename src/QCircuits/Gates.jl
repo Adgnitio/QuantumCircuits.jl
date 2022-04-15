@@ -129,7 +129,7 @@ macro rotationGate(name)
         Base.:(==)(g1::$name, g2::$name) = g1.qubit == g2.qubit && g1.θ == g2.θ
         Base.hash(g::$name, h::UInt) = hash((g.qubit, g.θ), h)
 
-        $name(qubits::Vector{T}, θ::ParamT) where T <: Integer = [$name(q, θ) for q in qubits]
+        $name(qubits::Vector{<:Integer}, θ::ParamT) = [$name(q, θ) for q in qubits]
         getArgs(g::$name) = (getid(g.qubit), g.θ)
     end)
 end

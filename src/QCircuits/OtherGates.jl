@@ -45,7 +45,7 @@ macro twoQubitsRotationGate(name)
         Base.:(==)(g1::$name, g2::$name) = g1.qubit1 == g2.qubit1 && g1.qubit2 == g2.qubit2 && g1.θ == g2.θ
         Base.hash(g::$name, h::UInt) = hash((g.qubit1, g.qubit2, g.θ), h)
 
-        #$name(qubis::Vector{T}, θ::ParamT) where T <: Integer = [$name(q, θ) for q in qubis]
+        #$name(qubis::Vector{<:Integer}, θ::ParamT) = [$name(q, θ) for q in qubis]
         getArgs(g::$name) = (getid(g.qubit1), getid(g.qubit2), g.θ)
 
         inv(g::$name) = $name(g.qubit1, g.qubit2, -g.θ)
