@@ -19,14 +19,14 @@ using QuantumCircuits.QCircuits.Math
 using QuantumCircuits.QCircuits.Circuit: toQiskit
 using QuantumCircuits.QCircuits.Gates: Rx, Ry, Rz, X, Y, Z, S, Sd, T, Td, H, CX, U3
 
-using Zygote
+import Zygote
 
 function test_derivate(qc, explen)
     pa = getRandParameters(qc)
     @test length(pa) == explen
     loss(params) = real(matrix_norm(tomatrix(qc, params)))
     loss(pa)
-    loss'(pa)
+    Zygote.gradient(loss, pa)[1]
 end
 
 ################################################################################

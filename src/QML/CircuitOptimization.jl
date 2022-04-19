@@ -13,7 +13,7 @@
 
 module CircuitOptimization
 
-using Zygote
+import Zygote
 
 using QuantumCircuits.QML.Optimization
 using QuantumCircuits.QCircuits.QBase
@@ -41,7 +41,7 @@ function multipleGradientDescent(qc, loss, addGlobalPhase; uϵ=ϵ, N=100, debug=
     bestParams = []
 
     debug && println("Calculate the derivate.")
-    dloss(params) = real(loss'(params))
+    dloss(params) = real(Zygote.gradient(loss, params)[1])
     debug && dloss(params)
 
     i = 1

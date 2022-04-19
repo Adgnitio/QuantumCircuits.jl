@@ -19,9 +19,7 @@ using QuantumCircuits.QCircuits.Math
 using QuantumCircuits.QCircuits.Circuit: toQiskit
 using QuantumCircuits.QCircuits.Circuit
 
-using Zygote
-using Zygote: jacobian
-
+import Zygote
 
 @test ket"0" == _0
 @test ket"1" == _1
@@ -151,7 +149,7 @@ execute(backend, qc, pa)
 
 loss(params::Vector{Float64}) = loss_expected_zero_state(execute(backend, qc, params))
 loss(pa)
-loss'(pa)
+Zygote.gradient(loss, pa)[1]
 
 
 #############################################################################
@@ -188,8 +186,8 @@ lossAD(params::Vector{Float64}) = loss_expected_zero_state(executeSim(params))
 
 res_sim = executeSim(pa)
 res_sim_los = lossAD(pa)
-res_sim_der = real.(lossAD'(pa))
-res_sim_jak = jacobian(executeSim, pa)[1]
+res_sim_der = real.(Zygote.gradient(lossAD, pa)[1])
+res_sim_jak = Zygote.jacobian(executeSim, pa)[1]
 
 res_dev, res_dev_jak = qjacobian(qiskitBackend, qc, pa)
 @test unitary_error(res_dev, res_sim) < 0.001
@@ -244,7 +242,7 @@ qc.measure([1, 3, 5], [0, 1, 2])
 pa = [3.762539403251488, 0.001127890377849541, 2.1658488014045303, 6.174052504545824, 4.9629009414952305, 0.38255621799191375, 1.7274354859392205, 1.0857210633046896, 3.103638820041333, 3.758391851901853, 0.5765051731246599, 0.5798377641373272, 3.8759799027809825, 0.6188604600285638, 4.2218535852028385, 2.2390389868469462, 2.6674508252859623, 5.878739321230936, 1.340082725285039, 5.916066560675415, 3.625237411363865, 5.4397023221566725, 6.212355261857649, 2.5222234263059673, 5.8952667846227405, 6.113119466717698, 0.9810581564033299]
 
 loss(params) = loss_expected_zero_state(execute(backend, qc, params))
-dloss(params) = real(loss'(params))
+dloss(params) = real(Zygote.gradient(loss, params)[1])
 
 ml = loss(pa)
 mdl = dloss(pa)
