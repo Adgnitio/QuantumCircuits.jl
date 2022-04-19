@@ -18,8 +18,12 @@ export unitary_error, matrix_norm, eye, observe_unitary_error,
        min_observe_unitary_error
 
 "Calculate the unitary matrix error"
-function unitary_error(exp_unit, mat_unit, exp_scale=1.0, mat_scale=1.0)
-    sum(((a,b),) -> abs2(a*exp_scale - b*mat_scale), zip(exp_unit, mat_unit))
+unitary_error(exp_unit, mat_unit) = _unitary_error(exp_unit, mat_unit)
+function unitary_error(exp_unit, mat_unit, exp_scale, mat_scale)
+    return _unitary_error(exp_unit, mat_unit, x -> x * exp_scale, x -> x * mat_scale)
+end
+function _unitary_error(exp_unit, mat_unit, fa=identity, fb=identity)
+    return sum(((a, b),) -> abs2(fa(a) - fb(b)), zip(exp_unit, mat_unit))
 end
 
 "Calculate the observe unitary matrix error, the error which we can obserwe
