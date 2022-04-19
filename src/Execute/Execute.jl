@@ -50,8 +50,6 @@ function _ket(position::Integer, n_qubits::Integer)
 end
 
 function str2state(s::AbstractString)
-    @assert all(c in ('0', '1') for c in s) "Only 0 and 1 are allowed."
-
     # code from: https://github.com/jlapeyre/QMatrices.jl/blob/eb20d94a69775fb5d6867b0996ae634d3329a5a5/src/construction.jl#L40-L62
     pos = parse(Int, s, base=2) + 1
     n_qubits = length(s)
