@@ -225,8 +225,8 @@ function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit::Integer, θ)
 end
 
 function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::Vector, θ)
-    for i in eachindex(qubits)
-        add!(qc, gate, qubits[i], θ)
+    for qubit in qubits
+        add!(qc, gate, qubit, θ)
     end
 end
 
@@ -244,7 +244,7 @@ function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit::Integer, θ, ϕ, �
 
     nothing
 end
-function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::AbstractVector, θ, ϕ, λ) 
+function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubits::AbstractVector, θ, ϕ, λ)
     for qubit in qubits
         add!(qc, gate, qubit, ParameterT(θ), ParameterT(ϕ), ParameterT(λ))
     end

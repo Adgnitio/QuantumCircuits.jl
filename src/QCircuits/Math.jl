@@ -18,25 +18,28 @@ export unitary_error, matrix_norm, eye, observe_unitary_error,
        min_observe_unitary_error
 
 "Calculate the unitary matrix error"
-function unitary_error(exp_unit, mat_unit)
-    sum(((a,b),) -> abs2(a - b), zip(exp_unit, mat_unit))
+unitary_error(exp_unit, mat_unit) = _unitary_error(exp_unit, mat_unit)
+function unitary_error(exp_unit, mat_unit, exp_scale, mat_scale)
+    return _unitary_error(exp_unit, mat_unit, x -> x * exp_scale, x -> x * mat_scale)
+end
+function _unitary_error(exp_unit, mat_unit, fa=identity, fb=identity)
+    return sum(((a, b),) -> abs2(fa(a) - fb(b)), zip(exp_unit, mat_unit))
 end
 
 "Calculate the observe unitary matrix error, the error which we can obserwe
 from quantum state"
 function observe_unitary_error(exp_unit, mat_unit, index=1)
     # Remove phase
-    exp_unit = exp_unit[:] .* cis(-angle(exp_unit[index]))
-    mat_unit = mat_unit[:] .* cis(-angle(mat_unit[index]))
+    exp_scale = cis(-angle(exp_unit[index]))
+    mat_scale = cis(-angle(mat_unit[index]))
 
-    return unitary_error(exp_unit, mat_unit)
+    return unitary_error(exp_unit, mat_unit, exp_scale, mat_scale)
 end
 
 "Calculate the minimum observe unitary matrix error."
 function min_observe_unitary_error(exp_unit, mat_unit)
     l = length(exp_unit)
-    ret = [observe_unitary_error(exp_unit, mat_unit, i) for i in 1:l]
-    return minimum(ret)
+    return minimum(i -> observe_unitary_error(exp_unit, mat_unit, i), 1:l)
 end
 
 "Calculate the matrix norm"
