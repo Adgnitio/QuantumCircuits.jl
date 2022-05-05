@@ -13,6 +13,7 @@
 include("MathTest.jl")
 include("RegistersTest.jl")
 include("CircuitTest.jl")
+include("CircuitMacroTest.jl")
 include("InstructionsTest.jl")
 include("CircuitSimplifyTest.jl")
 include("CircuitUnitaryTest.jl")

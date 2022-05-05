@@ -192,7 +192,8 @@ mutable struct U <: UniversalGate
 end
 U(qubit::Integer) = U(qubit, nothing, nothing, nothing)
 getArgs(g::U) = (getid(g.qubit), g.β, g.γ, g.δ)
-
+Base.:(==)(g1::U, g2::U) = g1.qubit == g2.qubit && g1.β == g2.β && g1.γ == g2.γ && g1.δ == g2.δ
+Base.hash(g::U, h::UInt) = hash((g.qubit, g.β, g.γ, g.δ), h)
 
 function setparameter!(param::ParameterT, params, i)
     param.value = params[i]
