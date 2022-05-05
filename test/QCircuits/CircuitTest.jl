@@ -25,8 +25,8 @@ using QuantumCircuits.QCircuits.Math
 #  Get save, parameters                                                        #
 ################################################################################
 qc = QCircuit(1)
-qc.u3(0, ParameterT(1.0), ParameterT(2.0), ParameterT(3.0))
-qc.u3(0, ParameterT(4.0), ParameterT(5.0), ParameterT(6.0))
+@gate qc.u3(0, ParameterT(1.0), ParameterT(2.0), ParameterT(3.0))
+@gate qc.u3(0, ParameterT(4.0), ParameterT(5.0), ParameterT(6.0))
 @test getparameters(qc) == [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
 
 
@@ -53,14 +53,18 @@ end
 #  Compare                                                                     #
 ################################################################################
 qc1 = QCircuit(2)
-qc1.x(0)
-qc1.h(1)
-qc1.cx(0, 1)
+@circ qc1 begin
+    x(0)
+    h(1)
+    cx(0, 1)
+end
 
 qc2 = QCircuit(2)
-qc2.h(1)
-qc2.x(0)
-qc2.cx(0, 1)
+@circ qc2 begin
+    h(1)
+    x(0)
+    cx(0, 1)
+end
 
 @test qc1 == qc2
 
@@ -68,14 +72,23 @@ qc2.cx(0, 1)
 qr11 = QuantumRegister(1)
 qr12 = QuantumRegister(1)
 qc1 = QCircuit([qr11, qr12])
-qc1.x(qr11[0])
-qc1.h(qr12[0])
+@gate qc1.x(qr11[0])
+@gate qc1.h(qr12[0])
 
 qc2 = QCircuit(2)
 qc2.h(1)
 qc2.x(0)
 
 @test qc1 == qc2
+
+qr11 = QuantumRegister(1)
+qr12 = QuantumRegister(1)
+qc1 = QCircuit([qr11, qr12])
+@circ qc1 begin
+    x(qr11[0])
+    h(qr12[0])
+end
+
 
 ################################################################################
 function check_inv(qc)

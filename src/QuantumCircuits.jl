@@ -21,6 +21,6 @@ using QuantumCircuits.QCircuits.Registers
 using QuantumCircuits.QCircuits.Circuit
 
 export QuantumCircuit, QuantumDevice, QuantumGate, add!, QCircuit,
-       QuantumRegister, ClassicalRegister, tomatrix, decompose, simplify
+       QuantumRegister, ClassicalRegister, tomatrix, decompose, simplify, @gate, @circ
 
 end # module
