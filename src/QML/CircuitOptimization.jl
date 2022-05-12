@@ -86,7 +86,7 @@ function findparam(expmat, qc; N=100, addGlobalPhase=false, debug=false, trystan
     #println("getparameters")
     #params = getparameters(qc)
 
-    lossPhase(params) = real(unitary_error(expmat, cis(params[1]) * tomatrix(qc, params[2:end])))
+    lossPhase(params) = real(unitary_error(expmat, cis(params[1]) * tomatrix(qc, @view(params[2:end]))))
     lossNoPhase(params) = real(unitary_error(expmat, tomatrix(qc, params)))
 
     if addGlobalPhase
