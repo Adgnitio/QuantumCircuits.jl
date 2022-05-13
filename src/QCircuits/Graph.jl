@@ -50,7 +50,7 @@ end
 "The index of start and end node."
 const StartEndNode = 0
 "Mapping from qubit number to line number."
-const qubitToLine(q) = q + 1
+qubitToLine(q) = q + 1
 
 "Add gate to circuit"
 function add!(g::DirectedGraph{IndexT}, gate::QuantumGate) where IndexT<:Integer
