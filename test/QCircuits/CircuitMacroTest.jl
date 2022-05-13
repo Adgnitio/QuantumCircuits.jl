@@ -130,6 +130,7 @@ add!(expc, QuantumCircuits.Circuit.Rx, 1, π/2)
 add!(expc, QuantumCircuits.Circuit.Ry, 0, π/3)
 add!(expc, QuantumCircuits.Circuit.Rz, 1, π/4)
 add!(expc, QuantumCircuits.Circuit.Rzx, 0, 1, π/2)
+add!(expc, QuantumCircuits.Circuit.U4, 0, 1, [i for i in 1:15])
 
 # @gate
 acirc = QCircuit(2)
@@ -146,6 +147,7 @@ acirc = QCircuit(2)
 @gate acirc.ry(0, π/3)
 @gate acirc.rz(1, π/4)
 @gate acirc.rzx(0, 1, π/2)
+@gate acirc.u4(0, 1, [i for i in 1:15])
 @test acirc == expc
 
 # @circ
@@ -164,9 +166,9 @@ acirc = QCircuit(2)
     ry(0, π/3)
     rz(1, π/4)
     rzx(0, 1, π/2)
+    u4(0, 1, [i for i in 1:15])
 end
 @test acirc == expc
-
 
 
 
