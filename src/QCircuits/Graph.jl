@@ -50,7 +50,7 @@ end
 "The index of start and end node."
 const StartEndNode = 0
 "Mapping from qubit number to line number."
-const qubitToLine(q) = q + 1
+qubitToLine(q) = q + 1
 
 "Add gate to circuit"
 function add!(g::DirectedGraph{IndexT}, gate::QuantumGate) where IndexT<:Integer
@@ -100,7 +100,7 @@ function to_vector(g::DirectedGraph{IndexT})::Vector{QuantumGate} where IndexT<:
     lines = g.start_nodes[1:end]
     code = QuantumGate[]
 
-    while any(lines .!= 0)
+    while any(!iszero, lines)
         for l in lines
             # if there is somethink to do :)
             if l != StartEndNode && isempty(intersect(gates, g.in_edges[l]))
