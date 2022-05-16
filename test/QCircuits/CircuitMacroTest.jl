@@ -96,7 +96,8 @@ foreach(i -> add!(expc, QuantumCircuits.Circuit.CX, i, i+1), 0:n-1)
 acirc = QCircuit(5)
 @circ acirc begin
     #TODO this doesn't works
-    n = 5-1 #acirc.qubits 
+    #n = 5-1
+    n = acirc.qubits - 1
     foreach(i -> h(i), 0:n)
     foreach(i -> cx(i, i+1), 0:n-1)
 end

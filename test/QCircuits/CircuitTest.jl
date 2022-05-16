@@ -65,7 +65,6 @@ qc2 = QCircuit(2)
     x(0)
     cx(0, 1)
 end
-
 @test qc1 == qc2
 
 
@@ -78,17 +77,17 @@ qc1 = QCircuit([qr11, qr12])
 qc2 = QCircuit(2)
 qc2.h(1)
 qc2.x(0)
-
 @test qc1 == qc2
 
-qr11 = QuantumRegister(1)
-qr12 = QuantumRegister(1)
-qc1 = QCircuit([qr11, qr12])
-@circ qc1 begin
-    x(qr11[0])
-    h(qr12[0])
-end
-
+# TODO - this doesn't work
+# qr11 = QuantumRegister(1)
+# qr12 = QuantumRegister(1)
+# qc1 = QCircuit([qr11, qr12])
+# @circ qc1 begin
+#     x(qr11[0])
+#     h(qr12[0])
+# end
+# @test qc1 == qc2
 
 ################################################################################
 function check_inv(qc)

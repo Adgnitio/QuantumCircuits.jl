@@ -350,10 +350,13 @@ macro circ(incirc, ex)
     incirc = esc(incirc)
 
     MacroTools.postwalk(ex) do x
-        (@capture(x, f_(args__)) && f in GateList) || return x
+        if !(@capture(x, f_(args__)) && f in GateList)
+            return esc(x) == incirc ? esc(x) : x
+        end
 
         # build the expression
-        return :(add!($incirc, ($f($(args...)))...))
+        #args = (esc(a) for a in args)
+        return :(add!($incirc, ($f($(args...)))...))        
     end
 end
 
