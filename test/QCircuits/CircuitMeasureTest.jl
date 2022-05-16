@@ -28,3 +28,10 @@ qc2.cx(3, 2)
 qc2.measure(1:3, 1:3)
 
 @test qc1 == qc2
+
+# Create circuit with barrier
+qc1 = QCircuit(4)
+qc1.x(2)
+qc1.h(1)
+qc1.barrier()
+qc1.cx(3, 2)
