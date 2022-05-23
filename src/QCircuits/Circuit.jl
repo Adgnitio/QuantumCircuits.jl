@@ -29,7 +29,7 @@ using MacroTools
 
 using LinearAlgebra
 
-using CBOO: @cbooify
+using CBOOCall: @cbooify
 
 import QuantumCircuits.QCircuits.QBase: add!, tomatrix, setparameters!, simplify,
        standardGateError, decompose, measure!, bindparameters!

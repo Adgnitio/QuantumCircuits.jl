@@ -4,7 +4,7 @@ authors = ["Rafał Pracht <rpracht@wp.pl>"]
 version = "0.1.0"
 
 [deps]
-CBOO = "b012eb62-94f7-4100-b683-fca14a09dfae"
+CBOOCall = "b012eb62-94f7-4100-b683-fca14a09dfae"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
 PyCall = "438e738f-606a-5dbb-bf0a-cddfbfd45ab0"
