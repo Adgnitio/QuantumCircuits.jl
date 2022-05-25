@@ -20,7 +20,7 @@ import Base: show, length, inv
 import QuantumCircuits.QCircuits.QBase: tomatrix, setparameters!, simplify,
        standardGateError, decompose, bindparameters!
 
-export X, Y, Z, S, Sd, T, Td, H, CX, U3, Rx, Ry, Rz, U, Sx,
+export X, Y, Z, S, Sd, T, Td, H, CX, U3, Rx, Ry, Rz, U, Sx, Sxd,
       getqubits, getqubitsids, toU3,
       ChromosomeGate, DNAGate, Parameters, getArgs, decompose,
       ParameterT, getvalue
@@ -76,8 +76,9 @@ abstract type UniversalGate <: QuantumGate end
 Base.:(==)(c1::QuantumGate, c2::QuantumGate) = false
 
 "Single qubit create macro"
-macro singleQubitGate(name)
+macro singleQubitGate(name, rawdoc)
     eval(quote
+        @doc $rawdoc
         struct $name <: QuantumGate qubit::Qubit end
 
         Base.:(==)(g1::$name, g2::$name) = g1.qubit == g2.qubit
@@ -88,17 +89,203 @@ macro singleQubitGate(name)
 end
 
 # Single qubit quantum gates
-@singleQubitGate(X)
-@singleQubitGate(Y)
-@singleQubitGate(Z)
-@singleQubitGate(S)
-@singleQubitGate(Sd)
-@singleQubitGate(H)
-@singleQubitGate(T)
-@singleQubitGate(Td)
-@singleQubitGate(Sx)
+@singleQubitGate(X,
+raw"""
+    X(qubit::Qubit)
+Single-qubit Pauli-X gate (``\sigma_x``), equivalent to [U3](@ref)(``\pi,0,\pi``)
+**Matrix Representation**
+```math
+X = \begin{pmatrix}
+0 & 1 \\
+1 & 0
+\end{pmatrix}
+```
 
-"CX Quantum Gate"
+```julia
+qc = QCircuit(1)
+qc.x(0)
+```
+""")
+@singleQubitGate(Y,
+raw"""
+    Y(qubit::Qubit)
+Single-qubit Pauli-Y gate (``\sigma_y``), equivalent to [U3](@ref)(``\pi,\frac{\pi}{2},\frac{\pi}{2}``)
+**Matrix Representation**
+```math
+Y = \begin{pmatrix}
+0 & -i \\
+i & 0
+\end{pmatrix}
+```
+
+```julia
+qc = QCircuit(1)
+qc.y(0)
+```
+""")
+@singleQubitGate(Z,
+raw"""
+    Z(qubit::Qubit)
+Single-qubit Pauli-Z gate (``\sigma_z``), equivalent to [U3](@ref)(``0,0,\pi``)
+**Matrix Representation**
+```math
+Z = \begin{pmatrix}
+1 & 0 \\
+0 & -1
+\end{pmatrix}
+```
+
+```julia
+qc = QCircuit(1)
+qc.z(0)
+```
+""")
+@singleQubitGate(S,
+raw"""
+    S(qubit::Qubit)
+Single-qubit S gate, equivalent to [U3](@ref)(``0,0,\frac{\pi}{2}``). This 
+gate is also referred to a square-root of Pauli-[Z](@ref).
+**Matrix Representation**
+```math
+S = \begin{pmatrix}
+1 & 0 \\
+0 & i
+\end{pmatrix}
+```
+
+```julia
+qc = QCircuit(1)
+qc.s(0)
+```
+""")
+@singleQubitGate(Sd,
+raw"""
+Sd(qubit::Qubit)
+Single-qubit, hermitian conjugate of the [S](@ref). This is also an alternative square root of 
+the [Z](@ref). 
+**Matrix Representation**
+```math
+S^{\dagger} = \begin{pmatrix}
+1 & 0 \\
+0 & -i
+\end{pmatrix}
+```
+
+```julia
+qc = QCircuit(1)
+qc.sd(0)
+```
+""")
+@singleQubitGate(H,
+raw"""
+    H(qubit::Qubit)
+Single-qubit Hadamard gate, which is a ``\pi`` rotation about the X+Z axis, thus equivalent to [U3](@ref)(``\frac{\pi}{2},0,\pi``)
+**Matrix Representation**
+```math
+H = \frac{1}{\sqrt{2}}
+        \begin{pmatrix}
+            1 & 1 \\
+            1 & -1
+        \end{pmatrix}
+```
+""")
+@singleQubitGate(T,
+raw"""
+    T(qubit::Qubit)
+Single-qubit T gate, equivalent to [U3](@ref)(``0,0,\frac{\pi}{4}``). This 
+gate is also referred to as a ``\frac{\pi}{8}`` gate or as a fourth-root of Pauli-[Z](@ref). 
+**Matrix Representation**
+```math
+T = \begin{pmatrix}
+1 & 0 \\
+0 & e^{i\pi/4}
+\end{pmatrix}
+```
+
+```julia
+qc = QCircuit(1)
+qc.t(0)
+```
+""")
+@singleQubitGate(Td,
+raw"""
+    Td(qubit::Qubit)
+Single-qubit, hermitian conjugate of the [T](@ref). This gate is equivalent to [U3](@ref)(``0,0,-\frac{\pi}{4}``). This 
+gate is also referred to as the fourth-root of Pauli-[Z](@ref). 
+**Matrix Representation**
+```math
+T^{\dagger} = \begin{pmatrix}
+1 & 0 \\
+0 & e^{-i\pi/4}
+\end{pmatrix}
+```
+
+```julia
+qc = QCircuit(1)
+qc.td(0)
+```
+""")
+@singleQubitGate(Sx,
+raw"""
+    Sx(qubit::Qubit)
+Single-qubit square root of pauli-[X](@ref).
+**Matrix Representation**
+```math
+\sqrt{X} = \frac{1}{2} \begin{pmatrix}
+1 + i & 1 - i \\
+1 - i & 1 + i
+\end{pmatrix}
+```
+
+```julia
+qc = QCircuit(1)
+qc.sx(0)
+```
+""")
+@singleQubitGate(Sxd,
+raw"""
+    Sxd(qubit::Qubit)
+Single-qubit hermitian conjugate of the square root of pauli-[X](@ref), or the [Sx](@ref).
+**Matrix Representation**
+```math
+\sqrt{X}^{\dagger} = \frac{1}{2} \begin{pmatrix}
+1 - i & 1 + i \\
+1 + i & 1 - i
+\end{pmatrix}
+```
+
+```julia
+qc = QCircuit(1)
+qc.sxd(0)
+```
+""")
+
+@doc raw"""
+    CX(control::Qubit, target::Qubit)
+Two-qubit controlled NOT gate with control and target on first and second qubits, respectively. This is also 
+called the controlled X gate. 
+**Circuit Representation**
+```
+q_0: ──■──
+     ┌─┴─┐
+q_1: ┤ X ├
+     └───┘
+```
+**Matrix Representation**
+```math
+CX = \begin{pmatrix}
+    1 & 0 & 0 & 0 \\
+    0 & 1 & 0 & 0 \\
+    0 & 0 & 0 & 1 \\
+    0 & 0 & 1 & 0
+    \end{pmatrix}
+```
+
+```julia
+qc = QCircuit(2)
+qc.cx(0, 1)
+```
+"""
 struct CX <: QuantumGate
     control::Qubit
     target::Qubit
@@ -118,8 +305,9 @@ getArgs(g::CX) = (getid(g.control), getid(g.target))
 abstract type RotationGate <: QuantumGate end
 
 "Rotation macro"
-macro rotationGate(name)
+macro rotationGate(name, rawdoc)
     eval(quote
+        @doc $rawdoc    
         mutable struct $name <: RotationGate
             qubit::Qubit
             θ::Parameter
@@ -134,9 +322,120 @@ macro rotationGate(name)
     end)
 end
 
-@rotationGate(Rx)
-@rotationGate(Ry)
-@rotationGate(Rz)
+@rotationGate(Rx,
+raw"""
+    Rx(qubit::Qubit, θ::Parameter)
+A single-qubit Pauli gate which represents rotation about the X axis.
+**Matrix Representation**
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+Rx(\theta) = exp(-i \th X) =
+    \begin{pmatrix}
+        \cos{\th}   & -i\sin{\th} \\
+        -i\sin{\th} & \cos{\th}
+    \end{pmatrix}
+```
+```julia
+qc = QCircuit(1)
+qc.rx(0, π/2)
+```
+
+You can also create a gate without adding parameter, in that case, it will be initialized by random values and can be used in Quantum Machine Learning as the loss function parameters.
+```julia
+using QuantumCircuits
+using QuantumCircuits.QML
+using QuantumCircuits.Execute
+
+# Expected circuit
+expqc = QCircuit(1)
+expqc.x(0)
+expmat = tomatrix(expqc)
+
+# The ansact
+qc = QCircuit(1)
+qc.rx(0)
+
+# Find the parameters which fit the expected unitary matrix in the best way.
+findparam(expmat, qc)
+
+```
+""")
+@rotationGate(Ry,
+raw"""
+    Ry(qubit::Qubit, θ::Parameter)
+A single-qubit Pauli gate which represents rotation about the Y axis.
+**Matrix Representation**
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+Ry(\theta) = exp(-i \th Y) =
+    \begin{pmatrix}
+        \cos{\th} & -\sin{\th} \\
+        \sin{\th} & \cos{\th}
+    \end{pmatrix}
+```
+```julia
+qc = QCircuit(1)
+qc.ry(0, π/2)
+```
+
+You can also create a gate without adding parameter, in that case, it will be initialized by random values and can be used in Quantum Machine Learning as the loss function parameters.
+```julia
+using QuantumCircuits
+using QuantumCircuits.QML
+using QuantumCircuits.Execute
+
+# Expected circuit
+expqc = QCircuit(1)
+expqc.y(0)
+expmat = tomatrix(expqc)
+
+# The ansact
+qc = QCircuit(1)
+qc.ry(0)
+
+# Find the parameters which fit the expected unitary matrix in the best way.
+findparam(expmat, qc)
+
+```
+""")
+@rotationGate(Rz,
+raw"""
+    Rz(qubit::Qubit, θ::Parameter)
+A single-qubit Pauli gate which represents rotation about the Z axis.
+
+**Matrix Representation**
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+Rz(\theta) = exp(-i\th Z) =
+\begin{pmatrix}
+    e^{-i\th} & 0 \\
+    0 & e^{i\th}
+\end{pmatrix}
+```julia
+qc = QCircuit(1)
+qc.rz(0, π/2)
+```
+
+You can also create a gate without adding parameter, in that case, it will be initialized by random values and can be used in Quantum Machine Learning as the loss function parameters.
+```julia
+using QuantumCircuits
+using QuantumCircuits.QML
+using QuantumCircuits.Execute
+
+# Expected circuit
+expqc = QCircuit(1)
+expqc.z(0)
+expmat = tomatrix(expqc)
+
+# The ansact
+qc = QCircuit(1)
+qc.rz(0)
+
+# Find the parameters which fit the expected unitary matrix in the best way.
+findparam(expmat, qc)
+
+```
+""")
 
 appendparams!(param, gate::RotationGate) = appendparams!(param, gate.θ)
 appendRandParams!(param, gate::RotationGate) = appendRandParams!(param, gate.θ)
@@ -147,7 +446,44 @@ function setparameters!(gate::RotationGate, params)
 end
 
 
-"The standard U3 gate"
+@doc raw"""
+    U3(qubit::Qubit, θ::Parameter, ϕ::Parameter, λ::Parameter)
+Universal single-qubit rotation gate with three Euler angles, ``\theta``, ``\phi`` and ``\lambda``.
+**Matrix Representation**
+```math
+\newcommand{\th}{\frac{\theta}{2}}
+U3(\theta, \phi, \lambda) =
+    \begin{pmatrix}
+        \cos(\th)          & -e^{i\lambda}\sin(\th) \\
+        e^{i\phi}\sin(\th) & e^{i(\phi+\lambda)}\cos(\th)
+    \end{pmatrix}
+```
+
+```julia
+qc = QCircuit(1)
+qc.u3(0, 1, 2, 3)
+```
+
+You can also create a gate without adding parameters, in that case, they will be initialized by random values and can be used in Quantum Machine Learning as the loss function parameters.
+```julia
+using QuantumCircuits
+using QuantumCircuits.QML
+using QuantumCircuits.Execute
+
+# Expected circuit
+expqc = QCircuit(1)
+expqc.x(0)
+expmat = tomatrix(expqc)
+
+# The ansact
+qc = QCircuit(1)
+qc.u3(0)
+
+# Find the parameters which fit the expected unitary matrix in the best way.
+findparam(expmat, qc)
+
+```
+"""
 mutable struct U3 <: UniversalGate
     qubit::Qubit
     θ::Parameter
