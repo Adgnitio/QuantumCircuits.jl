@@ -292,7 +292,7 @@ function measure!(qc::QCircuit, qubits::AbstractVector{<:Integer}, cbits::Abstra
 end
 
 function setMeasureMatrix!(qc::QCircuit)
-    measured = [(i-1, v) for (i, v) in enumerate(sort([getid(q)  for (q, c) in qc.measures]))]
+    measured = [(i-1, v) for (i, v) in enumerate(sort!([getid(q)  for (q, c) in qc.measures]))]
     measured_qubits = length(measured)
     mes_matrix = zeros(2^measured_qubits, 2^qc.qubits)
     for i in 0:(2^qc.qubits-1)
