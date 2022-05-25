@@ -32,6 +32,9 @@ struct U4 <: QuantumGate
 end
 U4(qubit1::Qubit, qubit2::Qubit) = U4(qubit1, qubit2, [ParameterT(rand() * 2π) for i in 1:U4_params])
 
+Base.:(==)(g1::U4, g2::U4) = g1.qubit1 == g2.qubit1 && g1.qubit2 == g2.qubit2 && g1.params == g2.params
+Base.hash(g::U4, h::UInt) = hash((g.qubit1, g.qubit2, g.params), h)
+
 getArgs(g::U4) = (getid(g.qubit1), getid(g.qubit2), params)
 
 "Return the qubits on which operate the gate"

@@ -25,7 +25,11 @@ using QuantumCircuits.QCircuits.Graph
 using QuantumCircuits.QCircuits.Math
 using QuantumCircuits.QCircuits.Qiskit: IS_QISKIT, NoQiskitError
 
+using MacroTools
+
 using LinearAlgebra
+
+using CBOOCall: @cbooify
 
 import QuantumCircuits.QCircuits.QBase: add!, tomatrix, setparameters!, simplify,
        standardGateError, decompose, measure!, bindparameters!
@@ -49,31 +53,10 @@ mutable struct QCircuit <: QuantumCircuit
     measures::Vector{Pair{Qubit, Cbit}}
     measures_matrix::Matrix{Float64}
 
-    # gates
-    x::Function
-    sx::Function
-    y::Function
-    z::Function
-    h::Function
-    cx::Function
-    s::Function
-    sdg::Function
-    t::Function
-    tdg::Function
-    u::Function
-    u3::Function
-    rx::Function
-    ry::Function
-    rz::Function
-    rzx::Function
-    u4::Function
-    barrier::Function
-    measure::Function
-
     function QCircuit(qRegs::Vector{QuantumRegister}, cRegs::Vector{ClassicalRegister})
         n = sum([length(i) for i in qRegs])
 
-        qc = new(n, qRegs, cRegs, DirectedGraph{Int}(n), false, QuantumGate[], Qubit[], ClassicalRegister[], Pair{Qubit, Cbit}[], eye(2^n), nop)
+        qc = new(n, qRegs, cRegs, DirectedGraph{Int}(n), false, QuantumGate[], Qubit[], ClassicalRegister[], Pair{Qubit, Cbit}[], eye(2^n))
 
         # assign the qregister to circuit
         for r in qRegs
@@ -91,27 +74,6 @@ mutable struct QCircuit <: QuantumCircuit
             setid(q, i - 1)
         end
 
-        # add gates
-        qc.x = q -> add!(qc, X, q)
-        qc.sx = q -> add!(qc, Sx, q)
-        qc.y = q -> add!(qc, Y, q)
-        qc.z = q -> add!(qc, Z, q)
-        qc.h = q -> add!(qc, H, q)
-        qc.cx = (c, t) -> add!(qc, CX, c, t)
-        qc.s = q -> add!(qc, S, q)
-        qc.sdg = q -> add!(qc, Sd, q)
-        qc.t = q -> add!(qc, T, q)
-        qc.tdg = q -> add!(qc, Td, q)
-        qc.u = (q, θ, ϕ, λ) -> add!(qc, U, q, θ, ϕ, λ)
-        qc.u3 = (q, θ=ParameterT(rand()*2π), ϕ=ParameterT(rand()*2π), λ=ParameterT(rand()*2π)) -> add!(qc, U3, q, θ, ϕ, λ)
-        qc.rx = (q, θ=ParameterT(rand()*2π)) -> add!(qc, Rx, q, θ)
-        qc.ry = (q, θ=ParameterT(rand()*2π)) -> add!(qc, Ry, q, θ)
-        qc.rz = (q, θ=ParameterT(rand()*2π)) -> add!(qc, Rz, q, θ)
-        qc.rzx = (q1, q2, θ=ParameterT(rand()*2π)) -> add!(qc, Rzx, q1, q2, θ)
-        qc.u4 = (q1, q2, params=[ParameterT(rand() * 2π) for i in 1:U4_params]) -> add!(qc, U4, q1, q2, params)
-        qc.barrier = () -> add!(qc, Barrier(qc.vqubits))
-        qc.measure = (q, c) -> measure!(qc, q, c)
-
         return qc
     end
 end
@@ -126,6 +88,53 @@ function QCircuit(qc::QCircuit)
 
     QCircuit(qregs, cregs)
 end
+
+###################################################################################
+@cbooify QCircuit (x, sx, y, z, h, cx, s, sdg, t, tdg, u, u3, rx, ry, rz, rzx, u4, barrier, measure)
+
+"Add function macro"
+macro addfunction(name, gate)
+    eval(quote
+        $name(qc::QCircuit, args...) = add!(qc, $gate, args...)
+    end)
+end
+macro addfunction1param(name, gate)
+    eval(quote
+        $name(qc::QCircuit, q, θ=ParameterT(rand()*2π)) = add!(qc, $gate, q, θ)
+    end)
+end
+macro addfunction3param(name, gate)
+    eval(quote
+        $name(qc::QCircuit, q, θ=ParameterT(rand()*2π), ϕ=ParameterT(rand()*2π), λ=ParameterT(rand()*2π)) = add!(qc, $gate, q, θ, ϕ, λ)
+    end)
+end
+
+@addfunction(x, X)
+@addfunction(sx, Sx)
+@addfunction(y, Y)
+@addfunction(z, Z)
+@addfunction(h, H)
+@addfunction(cx, CX)
+@addfunction(s, S)
+@addfunction(sdg, Sd)
+@addfunction(t, T)
+@addfunction(tdg, Td)
+@addfunction(u, U)
+
+@addfunction1param(rx, Rx)
+@addfunction1param(ry, Ry)
+@addfunction1param(rz, Rz)
+
+@addfunction3param(u3, U3)
+
+rzx(qc::QCircuit, q1, q2, θ=ParameterT(rand()*2π)) = add!(qc, Rzx, q1, q2, θ)
+u4(qc::QCircuit, q1, q2, params=[ParameterT(rand() * 2π) for i in 1:U4_params]) = add!(qc, U4, q1, q2, params)
+
+barrier(qc::QCircuit) = add!(qc, Barrier(qc.vqubits))
+measure(qc::QCircuit, q, c) = measure!(qc, q, c)
+
+
+###################################################################################
 
 function getCode(c::QCircuit)
     if c.has_code
@@ -301,6 +310,9 @@ function setMeasureMatrix!(qc::QCircuit)
 
     qc.measures_matrix = mes_matrix
 end
+
+
+###################################################################################
 
 "Add the classical register to circuit."
 function setClassicalRegister!(qc::QCircuit, cr::ClassicalRegister)

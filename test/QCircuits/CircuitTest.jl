@@ -57,11 +57,11 @@ qc1.x(0)
 qc1.h(1)
 qc1.cx(0, 1)
 
+
 qc2 = QCircuit(2)
 qc2.h(1)
 qc2.x(0)
 qc2.cx(0, 1)
-
 @test qc1 == qc2
 
 
@@ -74,8 +74,8 @@ qc1.h(qr12[0])
 qc2 = QCircuit(2)
 qc2.h(1)
 qc2.x(0)
-
 @test qc1 == qc2
+
 
 ################################################################################
 function check_inv(qc)
