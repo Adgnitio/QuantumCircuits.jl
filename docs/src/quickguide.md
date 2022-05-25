@@ -1,15 +1,4 @@
-Status: 
-[![CI](https://github.com/Adgnitio/QuantumCircuits.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/Adgnitio/QuantumCircuits.jl/actions/workflows/CI.yml)
-[![codecov](https://codecov.io/gh/Adgnitio/QuantumCircuits.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Adgnitio/QuantumCircuits.jl)
-
-<!-- Stable version: [![Documentation](--)](--/stable/) -->
-Dev version: [![Documentation](https://github.com/Adgnitio/QuantumCircuits.jl/actions/workflows/documentation.yml/badge.svg)](https://Adgnitio.github.io/QuantumCircuits.jl/dev/)
-
-
-
-# QuantumCircuits.jl
-QuantumCircuits is an open-source library for working with quantum computers at the application level, especially for Quantum Machine Learning and Quantum Finance.
-
+# Quick Start Guide
 
 ## Installation
 `QuantumCircuits` is in the general registry so you can install it by:
