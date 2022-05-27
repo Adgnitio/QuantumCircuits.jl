@@ -12,6 +12,7 @@ Zygote = "e88e6eb3-aa80-5325-afca-941959d7151f"
 
 [compat]
 CBOOCall = "0.1"
+MacroTools = "0.5"
 PyCall = "1.0"
 Zygote = "0.6"
 julia = "1.0"
