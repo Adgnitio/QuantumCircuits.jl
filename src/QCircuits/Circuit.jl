@@ -53,10 +53,10 @@ mutable struct QCircuit <: QuantumCircuit
     measures::Vector{Pair{Qubit, Cbit}}
     measures_matrix::Matrix{Float64}
 
-    function QCircuit(qRegs::Vector{QuantumRegister}, cRegs::Vector{ClassicalRegister})
+    function QCircuit(qRegs::Vector{QuantumRegister}, cRegs::Vector{ClassicalRegister}; inline_optimization=true)
         n = sum([length(i) for i in qRegs])
 
-        qc = new(n, qRegs, cRegs, DirectedGraph{Int}(n), false, QuantumGate[], Qubit[], ClassicalRegister[], Pair{Qubit, Cbit}[], eye(2^n))
+        qc = new(n, qRegs, cRegs, DirectedGraph{Int}(n, inline_optimization), false, QuantumGate[], Qubit[], ClassicalRegister[], Pair{Qubit, Cbit}[], eye(2^n))
 
         # assign the qregister to circuit
         for r in qRegs
@@ -77,11 +77,11 @@ mutable struct QCircuit <: QuantumCircuit
         return qc
     end
 end
-QCircuit(n::Integer) = QCircuit([QuantumRegister(n)], [ClassicalRegister(n)])
-QCircuit(qReg::QuantumRegister, cReg::ClassicalRegister) = QCircuit([qReg], [cReg])
-QCircuit(reg::QuantumRegister) = QCircuit([reg], ClassicalRegister[])
-QCircuit(regs::Vector{QuantumRegister}) = QCircuit(regs, [ClassicalRegister(sum([length(i) for i in regs]))])
-QCircuit(regs::Vector{QuantumRegister}, cReg::ClassicalRegister) = QCircuit(regs, [cReg])
+QCircuit(n::Integer; inline_optimization=true) = QCircuit([QuantumRegister(n)], [ClassicalRegister(n)], inline_optimization=inline_optimization)
+QCircuit(qReg::QuantumRegister, cReg::ClassicalRegister; inline_optimization=true) = QCircuit([qReg], [cReg], inline_optimization=inline_optimization)
+QCircuit(reg::QuantumRegister; inline_optimization=true) = QCircuit([reg], ClassicalRegister[], inline_optimization=inline_optimization)
+QCircuit(regs::Vector{QuantumRegister}; inline_optimization=true) = QCircuit(regs, [ClassicalRegister(sum([length(i) for i in regs]))], inline_optimization=inline_optimization)
+QCircuit(regs::Vector{QuantumRegister}, cReg::ClassicalRegister; inline_optimization=true) = QCircuit(regs, [cReg], inline_optimization=inline_optimization)
 function QCircuit(qc::QCircuit)
     qregs = [QuantumRegister(length(r), r.name) for r in qc.qRegisters]
     cregs = [ClassicalRegister(length(r), r.name) for r in qc.cRegisters]

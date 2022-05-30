@@ -35,6 +35,8 @@ end
 ParameterT() = ParameterT(nothing)
 ParameterT(param::ParameterT) = ParameterT(param.value)
 Base.show(io::IO, p::ParameterT) = print(io, "$(p.value)")
+"Comparator"
+Base.:(==)(p1::ParameterT, p2::ParameterT) = p1.value == p2.value
 
 const Parameter = Union{ParamT, ParameterT}
 
@@ -505,6 +507,12 @@ function bindparameters!(gate::U3)
     gate.ϕ = getvalue(gate.ϕ)
     gate.λ = getvalue(gate.λ)
 end
+
+
+isparam(::Any) = false
+isparam(::ParameterT) = true
+onlyParameters(::QuantumGate) = false
+onlyParameters(gate::U3) = isparam(gate.θ) && isparam(gate.ϕ) && isparam(gate.λ)
 
 # "The universar single qubit unitary gate macro"
 # macro universalGate(name)

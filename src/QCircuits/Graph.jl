@@ -14,6 +14,7 @@ module Graph
 
 using QuantumCircuits.QCircuits.QBase
 using QuantumCircuits.QCircuits.Gates
+using QuantumCircuits.QCircuits.Gates: onlyParameters
 import QuantumCircuits.QCircuits.QBase: add!
 
 export DirectedGraph, to_vector
@@ -30,10 +31,11 @@ struct DirectedGraph{IndexT<:Integer}
     #targets::Vector{QuantumGate}
     in_edges::Vector{Set{IndexT}}
     out_edges::Vector{Set{Pair{IndexT, IndexT}}}
+    inline_optimization::Bool
 end
 
 "Create new empyt graph"
-function DirectedGraph{IndexT}(qubits::Int) where IndexT<:Integer
+function DirectedGraph{IndexT}(qubits::Int, inline_optimization) where IndexT<:Integer
     g = DirectedGraph{IndexT}(
                       qubits,
                       zeros(IndexT, qubits),
@@ -42,7 +44,8 @@ function DirectedGraph{IndexT}(qubits::Int) where IndexT<:Integer
                       Dict{QuantumGate, IndexT}(),
                       Vector{Pair{IndexT, IndexT}}(),
                       Set{IndexT}[],
-                      Vector{Set{Pair{Integer, IndexT}}}[])
+                      Vector{Set{Pair{Integer, IndexT}}}[],
+                      inline_optimization)
 
     return g
 end
@@ -59,6 +62,23 @@ function add!(g::DirectedGraph{IndexT}, gate::QuantumGate) where IndexT<:Integer
 
     @assert length(g.vertices) == length(g.in_edges) "Inexpected inconsistency between length of vertices and in edges"
     @assert length(g.vertices) == length(g.out_edges) "Inexpected inconsistency between length of vertices and out edges"
+
+    # Chceck if this is and the previous are u3 gates with prameters 
+    # In that case we can skip adding this gate
+    if g.inline_optimization &&         # inline optimization is enabled
+       length(qubits) == 1 &&         # only single qubit
+       typeof(gate) == U3 &&          # u3 gate
+       onlyParameters(gate)           # use all 3 parameters
+       # get last qubit
+        q = qubitToLine(qubits[1]) # qiskit qubit start indexes from 0
+        last_end = g.end_nodes[q]
+        if last_end != StartEndNode &&                      # if there is a previous
+           typeof(g.vertices[last_end]) == U3 &&            # u3 gate
+           onlyParameters(g.vertices[last_end])             # use all 3 parameters
+            # We can skip add this gate
+            return nothing
+        end
+    end
 
     # calculate gate index
     push!(g.vertices, gate)

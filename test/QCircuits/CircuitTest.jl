@@ -24,7 +24,7 @@ using QuantumCircuits.QCircuits.Math
 ################################################################################
 #  Get save, parameters                                                        #
 ################################################################################
-qc = QCircuit(1)
+qc = QCircuit(1, inline_optimization=false)
 qc.u3(0, ParameterT(1.0), ParameterT(2.0), ParameterT(3.0))
 qc.u3(0, ParameterT(4.0), ParameterT(5.0), ParameterT(6.0))
 @test getparameters(qc) == [1.0, 2.0, 3.0, 4.0, 5.0, 6.0]
