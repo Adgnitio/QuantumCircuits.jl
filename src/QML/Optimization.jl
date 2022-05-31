@@ -19,10 +19,12 @@ export gradientDescent, OptimizationFunction
 struct StandardGD{T <: AbstractFloat}
     α::T
 end
-function (m::StandardGD)(x, df)
+function (m::StandardGD)(x, val, df; argsArePeriodic=false, debug=false, useBigValInc=false)
     for i in 1:length(x)
         x[i] = x[i] - m.α * df[i]
     end
+
+    return (nothing, m.α, 1)
 end
 
 "Momentum optimization algoritm"
@@ -33,11 +35,13 @@ mutable struct Momentum{T <: AbstractFloat}
 
     Momentum{T}(alfa::T, beta::T, len) where {T <: AbstractFloat} = new(alfa, beta, zeros(T, len))
 end
-function (m::Momentum)(x, df)
+function (m::Momentum)(x, val, df; argsArePeriodic=false, debug=false, useBigValInc=false)
     for i in 1:length(x)
         m.V[i] = m.β*m.V[i] + (1.0 - m.β)*df[i]
         x[i] = x[i] - m.α * m.V[i]
     end
+
+    return (nothing, m.α, 1)
 end
 
 "RMSprop optimization algoritm"
@@ -48,11 +52,13 @@ mutable struct RMSprop{T <: AbstractFloat}
 
     RMSprop{T}(alfa::T, beta::T, len) where {T <: AbstractFloat} = new(alfa, beta, zeros(T, len))
 end
-function (m::RMSprop)(x, df)
+function (m::RMSprop)(x, val, df; argsArePeriodic=false, debug=false, useBigValInc=false)
     for i in 1:length(x)
         m.S[i] = m.β*m.S[i] + (1.0 - m.β)*df[i]^2
         x[i] = x[i] - m.α * df[i] / (sqrt(m.S[i]) + 0.00000001)
     end
+    
+    return (nothing, m.α, 1)
 end
 
 "Adam optimization algoritm"
@@ -66,7 +72,7 @@ mutable struct Adam{T <: AbstractFloat}
 
     Adam{T}(alfa::T, beta1::T, beta2::T, len) where {T <: AbstractFloat} = new(alfa, beta1, beta2, zeros(T, len), zeros(T, len), 1)
 end
-function (a::Adam)(x, df)
+function (a::Adam)(x, val, df; argsArePeriodic=false, debug=false, useBigValInc=false)
     for i in 1:length(x)
         a.V[i] = a.β1*a.V[i] + (1.0 - a.β1)*df[i]
         a.S[i] = a.β2*a.S[i] + (1.0 - a.β2)*df[i]^2
@@ -77,6 +83,8 @@ function (a::Adam)(x, df)
         x[i] = x[i] - a.α * V / (sqrt(S) + 0.00000001)
     end
     a.t += 1
+
+    return (nothing, a.α, 1)
 end
 
 const Period = 2*π
@@ -191,25 +199,22 @@ end
 
 function gradientDescent(f, df, x; α=0.001, maxItr=nothing, ϵ=1e-8,
                          argsArePeriodic=false, isExpectedZero=false,
-                         debug=false, useBigValInc=false)
+                         debug=false, useBigValInc=false, opt=nothing)
     of = OptimizationFunction(true, (x) -> (f(x), df(x)), f)
     return gradientDescent(of, x; α=α, maxItr=maxItr, ϵ=ϵ,
                              argsArePeriodic=argsArePeriodic, isExpectedZero=isExpectedZero,
-                             debug=debug, useBigValInc=useBigValInc)
+                             debug=debug, useBigValInc=useBigValInc, opt=opt)
 end
 
 
 function gradientDescent(of::OptimizationFunction, x; α=0.001, maxItr=nothing, ϵ=1e-8,
                          argsArePeriodic=false, isExpectedZero=false,
-                         debug=false, useBigValInc=false, checkFn=nothing)
+                         debug=false, useBigValInc=false, checkFn=nothing, opt=nothing)
     process = true
 
-    #opt = StandardGD(α)
-    #opt = Momentum{Float64}(α, 0.9, length(x))
-    #opt = RMSprop{Float64}(α, 0.999, length(x))
-    #opt = Adam{Float64}(α, 0.9, 0.999, length(x))
-    opt = Eva{Float64}(α, length(x))
-    #opt = Eva{ComplexF64}(α, length(x))
+    if isnothing(opt)
+        opt = Eva{Float64}(α, length(x))
+    end
 
     if of.initial_check
         val = of.f(x)
