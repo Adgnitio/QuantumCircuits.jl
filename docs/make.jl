@@ -57,6 +57,3 @@ deploydocs(
     repo = "github.com/Adgnitio/QuantumCircuits.jl",
     push_preview = true
 )
-
-
-
