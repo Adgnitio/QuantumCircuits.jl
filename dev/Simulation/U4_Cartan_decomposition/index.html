@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>U4 - Cartan&#39;s KAK decomposition · QuantumCircuits.jl</title><script data-outdated-warner src="../../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.044/juliamono.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.11/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="../.."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../../assets/documenter.js"></script><script src="../../siteinfo.js"></script><script src="../../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><form class="docs-search" action="../../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../../">Introduction</a></li><li><a class="tocitem" href="../../quickguide/">Quick Start guide</a></li><li><span class="tocitem">Quantum Gates Library</span><ul><li><a class="tocitem" href="../../0_Single-qubit-gates/">Single-qubit gates s</a></li><li><a class="tocitem" href="../../1_Two-qubit-gates/">Two-qubit gates</a></li></ul></li><li><span class="tocitem">Novel algorithm to Simulation on NISQ device</span><ul><li><a class="tocitem" href="../problem_definition/">Problem definition</a></li><li class="is-active"><a class="tocitem" href>U4 - Cartan&#39;s KAK decomposition</a><ul class="internal"><li class="toplevel"><a class="tocitem" href="#ZZ,-XX,-and-YY-gates"><span>2 ZZ, XX, and YY gates</span></a></li><li class="toplevel"><a class="tocitem" href="#U4-Cartan&#39;s-KAK-decomposition"><span>3 U4 - Cartan&#39;s KAK decomposition</span></a></li><li class="toplevel"><a class="tocitem" href="#The-effective-implementation-of-the-Trotter-step"><span>4  The effective implementation of the Trotter step</span></a></li><li class="toplevel"><a class="tocitem" href="#Simulation"><span>5 Simulation</span></a></li></ul></li><li><a class="tocitem" href="../Trotterization/">Algorithm description</a></li></ul></li><li><span class="tocitem">Library References</span><ul><li><input class="collapse-toggle" id="menuitem-5-1" type="checkbox"/><label class="tocitem" for="menuitem-5-1"><span class="docs-label">QCircuits</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../QCircuits/Circuit/">Circuit</a></li><li><a class="tocitem" href="../../QCircuits/Gates/">Gates</a></li><li><a class="tocitem" href="../../QCircuits/Qiskit/">Qiskit</a></li><li><a class="tocitem" href="../../QCircuits/Registers/">Registers</a></li><li><a class="tocitem" href="../../QCircuits/Graph/">Graph</a></li><li><a class="tocitem" href="../../QCircuits/OtherGates/">OtherGates</a></li><li><a class="tocitem" href="../../QCircuits/ComplexGates/">ComplexGates</a></li><li><a class="tocitem" href="../../QCircuits/Instructions/">Instructions</a></li><li><a class="tocitem" href="../../QCircuits/Math/">Math</a></li><li><a class="tocitem" href="../../QCircuits/QBase/">QBase</a></li></ul></li><li><a class="tocitem" href="../../Execute/">Execute</a></li><li><input class="collapse-toggle" id="menuitem-5-3" type="checkbox"/><label class="tocitem" for="menuitem-5-3"><span class="docs-label">QML</span><i class="docs-chevron"></i></label><ul class="collapsed"><li><a class="tocitem" href="../../QML/QML/">QML</a></li><li><a class="tocitem" href="../../QML/Optimization/">Optimization</a></li><li><a class="tocitem" href="../../QML/CircuitOptimization/">Gates</a></li></ul></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li><a class="is-disabled">Novel algorithm to Simulation on NISQ device</a></li><li class="is-active"><a href>U4 - Cartan&#39;s KAK decomposition</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>U4 - Cartan&#39;s KAK decomposition</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/Adgnitio/QuantumCircuits.jl/blob/master/docs/src/Simulation/U4_Cartan_decomposition.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Cartan&#39;s-KAK-decomposition"><a class="docs-heading-anchor" href="#Cartan&#39;s-KAK-decomposition">1 Cartan&#39;s KAK decomposition</a><a id="Cartan&#39;s-KAK-decomposition-1"></a><a class="docs-heading-anchor-permalink" href="#Cartan&#39;s-KAK-decomposition" title="Permalink"></a></h1><p>We want to implement the trotter step in an effective way, but a naive implementation of ZZ, XX, and YY gates requires 6 CX gates. We will show how to do the same using only the 3CX gate by Cartan&#39;s KAK decomposition.</p><h1 id="ZZ,-XX,-and-YY-gates"><a class="docs-heading-anchor" href="#ZZ,-XX,-and-YY-gates">2 ZZ, XX, and YY gates</a><a id="ZZ,-XX,-and-YY-gates-1"></a><a class="docs-heading-anchor-permalink" href="#ZZ,-XX,-and-YY-gates" title="Permalink"></a></h1><p>Now we have to create ZZ, XX, and YY gates for use in simulation.</p><pre><code class="language-julia hljs">using QuantumCircuits
+using QuantumCircuits.QML
+using QuantumCircuits.QCircuits.Qiskit
+using QuantumCircuits.QCircuits.Qiskit: qiskit
+using QuantumCircuits.QCircuits.Circuit
+using QuantumCircuits.QCircuits.Circuit: toQiskit, getCode
+using QuantumCircuits.QCircuits.Gates: CX
+using QuantumCircuits.Execute: generate_mesuere_circuits, extractProbability, correctMeasures</code></pre><pre><code class="language-julia hljs"># This code com from using QuantumCircuits.Simulation.Gates module.
+function ZZ(qc, q0, q1, t, usePulse=false)
+    if usePulse
+        qc.h(q1)
+        qc.rzx(q0, q1, t)
+        qc.x(q0)
+        qc.rzx(q0, q1, -t)
+        qc.x(q0)
+        qc.h(q1)
+    else
+        qc.cx(q0, q1)
+        qc.rz(q1, 2*t)
+        qc.cx(q0, q1)
+    end
+end
+
+function YY(qc, q0, q1, t, usePulse=false)
+    if usePulse
+        qc.sdg([q0, q1])
+        qc.h(q0)
+        qc.rzx(q0, q1, t)
+        qc.x(q0)
+        qc.rzx(q0, q1, -t)
+        qc.x(q0)
+        qc.h(q0)
+        qc.s([q0, q1])
+    else
+        qc.rx([q0, q1], π/2)
+        qc.cx(q0, q1)
+        qc.rz(q1, 2*t)
+        qc.cx(q0, q1)
+        qc.rx([q0, q1], -π/2)
+    end
+end
+
+function XX(qc, q0, q1, t, usePulse=false)
+    if usePulse
+        qc.h(q0)
+        qc.rzx(q0, q1, t)
+        qc.x(q0)
+        qc.rzx(q0, q1, -t)
+        qc.x(q0)
+        qc.h(q0)
+    else
+        qc.ry([q0, q1], π/2)
+        qc.cx(q0, q1)
+        qc.rz(q1, 2*t)
+        qc.cx(q0, q1)
+        qc.ry([q0, q1], -π/2)
+    end
+end</code></pre><h1 id="U4-Cartan&#39;s-KAK-decomposition"><a class="docs-heading-anchor" href="#U4-Cartan&#39;s-KAK-decomposition">3 U4 - Cartan&#39;s KAK decomposition</a><a id="U4-Cartan&#39;s-KAK-decomposition-1"></a><a class="docs-heading-anchor-permalink" href="#U4-Cartan&#39;s-KAK-decomposition" title="Permalink"></a></h1><p>Any 2 qubits unitary can be decomposed used 3 cx gate (see the paper <em>&quot;Minimal Universal Two-qubit Quantum Circuits&quot;</em> https://arxiv.org/abs/quant-ph/0308033). In QuantumCircuits library we have defined the U4 gate.</p><pre><code class="language-julia hljs">qc = QCircuit(2)
+# Create u4 gate with random parameter
+qc.u4(0, 1) 
+
+# Decompose circuit to use base gates
+qc2 = decompose(qc)
+qc2</code></pre><pre><code class="nohighlight hljs">      ┌──────────────────────────┐┌───┐┌────────────┐                   ┌───┐»
+q0_0: ┤ U3(2.2832,4.3098,1.6032) ├┤ X ├┤ Rz(3.6536) ├──■────────────────┤ X ├»
+      ├─────────────────────────┬┘└─┬─┘├────────────┤┌─┴─┐┌────────────┐└─┬─┘»
+q0_1: ┤ U3(4.263,1.3415,2.3539) ├───■──┤ Ry(5.2857) ├┤ X ├┤ Ry(4.1467) ├──■──»
+      └─────────────────────────┘      └────────────┘└───┘└────────────┘     »
+c0: 2/═══════════════════════════════════════════════════════════════════════»
+                                                                             »
+«      ┌────────────────────────────┐
+«q0_0: ┤ U3(3.4384,0.79627,0.14553) ├
+«      └┬──────────────────────────┬┘
+«q0_1: ─┤ U3(4.9937,3.1561,5.6151) ├─
+«       └──────────────────────────┘ 
+«c0: 2/══════════════════════════════
+«                                    </code></pre><p>Let us assume that we would like to find parameters of the U4 gate implementing exactly ZZ, YY, and XX gate combinations for a given time <span>$t$</span>.</p><pre><code class="language-julia hljs">t = π/2
+
+qc = QCircuit(2)
+ZZ(qc, 0, 1, t)
+YY(qc, 0, 1, t)
+XX(qc, 0, 1, t)
+expmat = tomatrix(qc)
+qc</code></pre><pre><code class="nohighlight hljs">                         ┌─────────┐                   ┌──────────┐┌─────────┐»
+q1_0: ──■─────────────■──┤ Rx(π/2) ├──■─────────────■──┤ Rx(-π/2) ├┤ Ry(π/2) ├»
+      ┌─┴─┐┌───────┐┌─┴─┐├─────────┤┌─┴─┐┌───────┐┌─┴─┐├──────────┤├─────────┤»
+q1_1: ┤ X ├┤ Rz(π) ├┤ X ├┤ Rx(π/2) ├┤ X ├┤ Rz(π) ├┤ X ├┤ Rx(-π/2) ├┤ Ry(π/2) ├»
+      └───┘└───────┘└───┘└─────────┘└───┘└───────┘└───┘└──────────┘└─────────┘»
+c1: 2/════════════════════════════════════════════════════════════════════════»
+                                                                              »
+«                         ┌──────────┐
+«q1_0: ──■─────────────■──┤ Ry(-π/2) ├
+«      ┌─┴─┐┌───────┐┌─┴─┐├──────────┤
+«q1_1: ┤ X ├┤ Rz(π) ├┤ X ├┤ Ry(-π/2) ├
+«      └───┘└───────┘└───┘└──────────┘
+«c1: 2/═══════════════════════════════
+«                                     </code></pre><p>We have to choose the ansact, in our case this will be a U4 gate and in that case, we are sure that we always can find the correct parameters.</p><pre><code class="language-julia hljs">qr = QuantumRegister(2)
+qc = QCircuit(qr)
+qc.u4(qr[0], qr[1])
+
+params = getRandParameters(qc)
+setparameters!(qc, params)
+qc = decompose(qc)</code></pre><pre><code class="nohighlight hljs">      ┌───────────────────────────┐┌───┐┌────────────┐                   ┌───┐»
+q2_0: ┤ U3(1.7624,0.77116,3.9005) ├┤ X ├┤ Rz(5.2775) ├──■────────────────┤ X ├»
+      └┬──────────────────────────┤└─┬─┘├────────────┤┌─┴─┐┌────────────┐└─┬─┘»
+q2_1: ─┤ U3(5.0677,5.7902,6.2463) ├──■──┤ Ry(4.4635) ├┤ X ├┤ Ry(2.5877) ├──■──»
+       └──────────────────────────┘     └────────────┘└───┘└────────────┘     »
+«      ┌──────────────────────────┐
+«q2_0: ┤ U3(0.89282,1.8969,3.728) ├
+«      ├──────────────────────────┤
+«q2_1: ┤ U3(4.2926,2.4936,2.6366) ├
+«      └──────────────────────────┘</code></pre><p>Now we can find the parameter of our ansact that perfectly fit our expected unitary matrix.</p><pre><code class="language-julia hljs">params, _, err, _  = findparam(expmat, qc, debug=false, trystandard=false)
+err</code></pre><pre><code class="nohighlight hljs">8.988143676440324e-8</code></pre><pre><code class="language-julia hljs">qc</code></pre><pre><code class="nohighlight hljs">      ┌──────────────────────────┐┌───┐┌──────────┐                ┌───┐»
+q3_0: ┤ U3(1.4791,0.48683,4.394) ├┤ X ├┤ Rz(3π/2) ├──■─────────────┤ X ├»
+      └─┬─────────────────────┬──┘└─┬─┘├──────────┤┌─┴─┐┌─────────┐└─┬─┘»
+q3_1: ──┤ U3(π,5.7747,5.1031) ├─────■──┤ Ry(3π/2) ├┤ X ├┤ Ry(π/2) ├──■──»
+        └─────────────────────┘        └──────────┘└───┘└─────────┘     »
+«      ┌───────────────────────────┐
+«q3_0: ┤ U3(-1.4791,1.8894,4.2257) ├
+«      └──┬─────────────────────┬──┘
+«q3_1: ───┤ U3(π,1.9652,2.8646) ├───
+«         └─────────────────────┘   </code></pre><p>A description of the optimization method used is available in the notebook <a href="../../QML/Optimization/#Eva">Eva</a>.</p><h1 id="The-effective-implementation-of-the-Trotter-step"><a class="docs-heading-anchor" href="#The-effective-implementation-of-the-Trotter-step">4  The effective implementation of the Trotter step</a><a id="The-effective-implementation-of-the-Trotter-step-1"></a><a class="docs-heading-anchor-permalink" href="#The-effective-implementation-of-the-Trotter-step" title="Permalink"></a></h1><p>Assume that we would like to implement the Trotter step using the second-order Trotter formula (see <em>&quot;Quantum computers as universal quantum simulators: state-of-art and perspectives&quot;</em> https://arxiv.org/abs/1907.03505), we can do this using the circuit in below.</p><p><img src="../../assets/simulation/Trotter_step.png" alt="image"/></p><p>Using Cartan&#39;s KAK decomposition we can rewrite this circuit and replace ZZ, YY, and XX by singe U4 gate as in Figure below.</p><p><img src="../../assets/simulation/Trotter_u4.jpg" alt="image"/></p><p>Assume that we would like to implement the 2 Trotter step using the second-order Trotter formula. Using Cartan&#39;s KAK decomposition each step contains 3 U4 gates. But merging the two <span>$U4$</span> gates on qubits 0 and 1, the two steps of the Trotter formula using KAK decomposition look like in the Figure below. It&#39;s worth noting that these two steps of Trotter utilize only 15 CNOT gates (3 CNOT for each of the U4 gates).</p><p><img src="../../assets/simulation/Trotter_x2_u4.png" alt="image"/></p><p>Effective implementation of the two steps is important because this is how much we use in the model training process (see <a href="https://github.com/rafal-pracht/OpenScience21.jl/blob/main/04_algorithm_evaluation.ipynb">Algorithm evaluation</a>). However, a similar method of connecting two U4 gates can be used for any number of steps. </p><h1 id="Simulation"><a class="docs-heading-anchor" href="#Simulation">5 Simulation</a><a id="Simulation-1"></a><a class="docs-heading-anchor-permalink" href="#Simulation" title="Permalink"></a></h1><p>First we create helper function which find the parameter for U4 for ZZ, YY, and XX gates and ZZ, YY, XX, ZZ, YY and, XX and Trotter step.</p><pre><code class="language-julia hljs"># This code com from using QuantumCircuits.Simulation.Gates module.
+function findU4paramsZZYYXX(t; debug=false)
+    qc = QCircuit(2)
+    ZZ(qc, 0, 1, t)
+    YY(qc, 0, 1, t)
+    XX(qc, 0, 1, t)
+    expmat = tomatrix(qc)
+
+
+    qr = QuantumRegister(2)
+    qc = QCircuit(qr)
+    qc.u4(qr[0], qr[1])
+
+    params = getRandParameters(qc)
+    setparameters!(qc, params)
+    qc = decompose(qc)
+
+    params, _, err, _  = findparam(expmat, qc, debug=debug, trystandard=false)
+
+    @assert err &lt; 1e-5 &quot;The error of U gate should be small but it is $err.&quot;
+
+    return params
+end
+
+function findU4paramsZZYYXXx2(t; debug=false)
+    qc = QCircuit(2)
+    ZZ(qc, 0, 1, t)
+    YY(qc, 0, 1, t)
+    XX(qc, 0, 1, t)
+    ZZ(qc, 0, 1, t)
+    YY(qc, 0, 1, t)
+    XX(qc, 0, 1, t)
+    expmat = tomatrix(qc)
+
+
+    qr = QuantumRegister(2)
+    qc = QCircuit(qr)
+    qc.u4(qr[0], qr[1])
+
+    params = getRandParameters(qc)
+    setparameters!(qc, params)
+    qc = decompose(qc)
+
+    params, _, err, _  = findparam(expmat, qc, debug=debug, trystandard=false)
+    @assert err &lt; 1e-5 &quot;The error of U gate should be small but it is $err.&quot;
+
+    return params
+end
+
+function trotter2U4(qc, qubits, t, isFirst, isLast, params, params2, params3)
+    if isFirst
+        for i in 1:(length(qubits)-2)
+            qc.u4(qubits[i], qubits[i+1], params2)
+        end
+    end
+
+    i = length(qubits) - 1
+    qc.u4(qubits[i], qubits[i+1], params)
+
+    if isLast
+        for i in 1:(length(qubits)-2)
+            qc.u4(qubits[i], qubits[i+1], params2)
+        end
+    else
+        for i in 1:(length(qubits)-2)
+            qc.u4(qubits[i], qubits[i+1], params3)
+        end
+    end
+end</code></pre><p>Next function generate circuit of the simulation algorithm for given Trotter steps number.</p><pre><code class="language-julia hljs">function generate_circuit(trotter_steps, run_step, t=π, params=nothing, params2=nothing, params3=nothing; init=false, debug=false)
+    qr = QuantumRegister(7, &quot;q&quot;)
+    qc = QCircuit(qr)
+
+    # Prepare initial state (remember we are only evolving 3 of the 7 qubits on jakarta qubits (q_5, q_3, q_1) corresponding to the state |110&gt;)
+    if init
+        qc.x([3, 5])  # DO NOT MODIFY (|q_5,q_3,q_1&gt; = |110&gt;)
+    end
+
+    if params == nothing
+        params = findU4paramsZZYYXX(t / trotter_steps, debug=debug)
+        params2 = findU4paramsZZYYXX(t / (2 * trotter_steps), debug=debug)
+        params3 = findU4paramsZZYYXXx2(t / (2 * trotter_steps), debug=debug)
+    end
+
+    qubits = [qr[1], qr[3], qr[5]]
+    for s in 1:run_step
+        isFirst = s == 1
+        isLast = s == run_step
+
+        trotter2U4(qc, qubits, t / trotter_steps, isFirst, isLast, params, params2, params3)
+    end
+
+    qc = decompose(qc)
+    return qc, params, params2, params3
+end</code></pre><p>Now we can generate the circuit.</p><pre><code class="language-julia hljs">t = π
+trotter_steps = 10
+qc_full, _, _, _ = generate_circuit(trotter_steps, trotter_steps, t, init=true)
+
+# Add measurment
+cr = ClassicalRegister(3)
+setClassicalRegister!(qc_full, cr)
+qc_full.measure([1, 3, 5], [0, 1, 2])
+qc_full</code></pre><pre><code class="nohighlight hljs">q_0: ─────────────────────────────────────────────────────────────────────────»
+      ┌────────────────────────┐                              ┌───┐┌──────────┐»
+ q_1: ┤ U3(2π,5.3676,0.032489) ├──────────────────────────────┤ X ├┤ Rz(7π/5) ├»
+      └────────────────────────┘                              └─┬─┘└──────────┘»
+ q_2: ──────────────────────────────────────────────────────────┼──────────────»
+                ┌───┐             ┌────────────────────────┐    │  ┌──────────┐»
+ q_3: ──────────┤ X ├─────────────┤ U3(-π,0.70057,-1.7539) ├────■──┤ Ry(7π/5) ├»
+                └───┘             └────────────────────────┘       └──────────┘»
+ q_4: ─────────────────────────────────────────────────────────────────────────»
+                ┌───┐           ┌────────────────────────────┐                 »
+ q_5: ──────────┤ X ├───────────┤ U3(3.1416,3.5375,-0.46269) ├─────────────────»
+                └───┘           └────────────────────────────┘                 »
+ q_6: ─────────────────────────────────────────────────────────────────────────»
+                                                                               »
+c2: 3/═════════════════════════════════════════════════════════════════════════»
+                                                                               »
+«                                                       »
+« q_0: ─────────────────────────────────────────────────»
+«                        ┌───┐ ┌─────────────────────┐  »
+« q_1: ──■───────────────┤ X ├─┤ U3(0,5.1954,6.6832) ├──»
+«        │               └─┬─┘ └─────────────────────┘  »
+« q_2: ──┼─────────────────┼────────────────────────────»
+«      ┌─┴─┐┌───────────┐  │  ┌────────────────────────┐»
+« q_3: ┤ X ├┤ Ry(12π/5) ├──■──┤ U3(π,0.96835,0.084917) ├»
+...
+«                                                                    ║  ║ 
+« q_6: ──────────────────────────────────────────────────────────────╫──╫─
+«                                                                    ║  ║ 
+«c2: 3/══════════════════════════════════════════════════════════════╩══╩═
+«                                                                    0  1 </code></pre><p>Next helper function is used to compare the simulation results with  exact values.</p><pre><code class="language-julia hljs">using QuantumCircuits.QCircuits.Math
+using QuantumCircuits.QCircuits.Gates: Xmatrix, Ymatrix, Zmatrix
+
+XXs = kron(kron(eye(2), Xmatrix), Xmatrix) + kron(kron(Xmatrix, Xmatrix), eye(2))
+YYs = kron(kron(eye(2), Ymatrix), Ymatrix) + kron(kron(Ymatrix, Ymatrix), eye(2))
+ZZs = kron(kron(eye(2), Zmatrix), Zmatrix) + kron(kron(Zmatrix, Zmatrix), eye(2))
+Hs = XXs + YYs + ZZs
+
+U_heis3(t) = exp(-im * Hs * t)
+
+const backend = QuantumSimulator()
+
+function check_simulation_err(qc, t)
+    sym_full = execute(backend, qc)
+    exp_full = U_heis3(t) * ket&quot;110&quot;
+    exp_full = abs.(exp_full) .^ 2
+    return sum(abs.(sym_full - exp_full))
+end</code></pre><p>And, now we can check the results.</p><pre><code class="language-julia hljs">check_simulation_err(qc_full, t)</code></pre><pre><code class="nohighlight hljs">0.102783108661551</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../problem_definition/">« Problem definition</a><a class="docs-footer-nextpage" href="../Trotterization/">Algorithm description »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.18 on <span class="colophon-date" title="Tuesday 31 May 2022 19:02">Tuesday 31 May 2022</span>. Using Julia version 1.7.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
