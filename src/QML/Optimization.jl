@@ -92,7 +92,11 @@ const PeriodThreshold = 1.5 * Period
 const FinalPeriodThreshold = 1.05 * Period
 
 
-"Evolutionary Alpha optimization algoritm"
+@doc raw"""
+Evolutionary Alpha optimization algorithm
+
+The most popular optimization method in machine learning are is ADAM: *"Adam: A Method for Stochastic Optimization"* https://arxiv.org/abs/1412.6980. This method use only first derivative and the step is different for all of the parameters and it is changed in the way that combine the RMSprop and momentum method. I've found that better for your case work method which has different adaptive approach we calculate the estimation of the second derivative using the changes of derivative from two steps.
+"""
 mutable struct Eva{T <: AbstractFloat}
 #mutable struct Eva{T}
     α::Vector{T}

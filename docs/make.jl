@@ -27,7 +27,7 @@ makedocs(
         "Novel algorithm to Simulation on NISQ device" => [
             "Problem definition" => "Simulation/problem_definition.md",
             "U4 - Cartan's KAK decomposition" => "Simulation/U4_Cartan_decomposition.md",
-            "Novel algorithm to Trotterization on NISQ device" => "Simulation/Trotterization.md",
+            "Algorithm description" => "Simulation/Trotterization.md",
         ],
         "Library References" => [
             "QCircuits" => [
