@@ -5,3 +5,4 @@ Library QuantumCircuits contains the following modules:
 * QCircuits - the module used to create quantum circuits, manipulate them and convert them to Qiskit if necessary.
 * Execute - module to execute the quantum circuit on a Julia quantum simulator or on a real device using Qiskit.
 * QML - Quantum Machine learning module which contains the optimization method and QML tools.
+* Simulation - Quantum Simulation module

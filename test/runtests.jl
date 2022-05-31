@@ -24,3 +24,7 @@ end
 @testset "QML           " begin
     include("QML/QMLTest.jl")
 end
+
+@testset "Simulation    " begin
+    include("Simulation/SimulationTest.jl")
+end

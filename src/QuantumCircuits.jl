@@ -15,6 +15,7 @@ module QuantumCircuits
 include("QCircuits/QCircuits.jl")
 include("QML/QML.jl")
 include("Execute/Execute.jl")
+include("Simulation/Simulation.jl")
 
 using QuantumCircuits.QCircuits.QBase
 using QuantumCircuits.QCircuits.Registers
