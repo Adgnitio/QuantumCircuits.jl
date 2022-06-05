@@ -73,3 +73,35 @@ val, x, itr = gradientDescent(testFun1, dtestFun1, [10.0, 10.0], α=0.0001, maxI
 @test abs(val) < ϵ
 @test abs(transpose(x)*x) < ϵ
 @test itr == 3
+
+
+# Test other methods
+using QuantumCircuits.QML.Optimization: StandardGD, Momentum, RMSprop, Adam
+
+
+# Standard gradient descent
+opt = StandardGD(0.001)
+val, x, itr = gradientDescent(testFun1, dtestFun1, [10.0, 10.0], maxItr=10000000, opt=opt)
+@test abs(val) < ϵ
+@test abs(transpose(x)*x) < ϵ
+
+
+# Momentum optimization algoritm
+opt = Momentum{Float64}(0.1, 0.9, 2)
+val, x, itr = gradientDescent(testFun1, dtestFun1, [10.0, 10.0], maxItr=10000000, opt=opt)
+@test abs(val) < ϵ
+@test abs(transpose(x)*x) < ϵ
+
+
+# RMSprop optimization algoritm
+opt = RMSprop{Float64}(0.1, 0.9, 2)
+val, x, itr = gradientDescent(testFun1, dtestFun1, [10.0, 10.0], maxItr=10000000, opt=opt)
+@test abs(val) < ϵ
+@test abs(transpose(x)*x) < ϵ
+
+
+# Adam optimization algoritm
+opt = Adam{Float64}(0.1, 0.9, 0.999, 2)
+val, x, itr = gradientDescent(testFun1, dtestFun1, [10.0, 10.0], maxItr=10000000, opt=opt)
+@test abs(val) < ϵ
+@test abs(transpose(x)*x) < ϵ

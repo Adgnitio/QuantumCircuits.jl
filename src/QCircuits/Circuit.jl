@@ -40,7 +40,37 @@ export QCircuit, getparameters, getRandParameters, toString, setClassicalRegiste
 "Nothing function"
 const nop = () -> nothing
 
-"Quantum circuit."
+@doc raw"""
+    QCircuit - Quantum Circuit structure
+The fundamental element of quantum computing is the quantum circuit. A quantum circuit is a computational routine consisting of coherent quantum operations on quantum data, such as qubits. It is an ordered sequence of quantum gates, measurements and resets, which may be conditioned on real-time classical computation. A set of quantum gates is said to be universal if any unitary transformation of the quantum data can be efficiently approximated arbitrarily well as as sequence of gates in the set. Any quantum program can be represented by a sequence of quantum circuits and classical near-time computation.
+
+In QuantumCircuits, this core element is represented by the QCircuit struct.
+Below is an example of a quantum circuit that makes a three-qubit GHZ state defined as:
+```math
+|\psi\rangle = \frac{|000\rangle + |111\rangle}{\sqrt{2}}
+```
+
+```julia
+using QuantumCircuits
+qc = QCircuit(3)
+qc.h(0)
+qc.cx(0, 1)
+qc.cx(1, 2)
+```
+
+```
+      ┌───┐          
+q0_0: ┤ H ├──■───────
+      └───┘┌─┴─┐     
+q0_1: ─────┤ X ├──■──
+           └───┘┌─┴─┐
+q0_2: ──────────┤ X ├
+                └───┘
+c0: 3/═══════════════
+                     
+```
+
+"""
 mutable struct QCircuit <: QuantumCircuit
     qubits::Int
     qRegisters::Vector{QuantumRegister}

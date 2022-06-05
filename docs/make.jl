@@ -1,3 +1,6 @@
+#Pkg.activate(".")
+#Pkg.instantiate() 
+
 using Documenter
 using DocumenterTools: Themes
 
@@ -9,8 +12,6 @@ makedocs(
     modules = [QuantumCircuits],
     sitename = "QuantumCircuits.jl",
     format = Documenter.HTML(mathengine = Documenter.MathJax(), 
-                             assets = [asset("https://fonts.googleapis.com/css?family=Montserrat|Source+Code+Pro&display=swap", class=:css),
-                                             "assets/extra_styles.css"],
                              prettyurls = get(ENV, "CI", nothing) == "true",
                              sidebar_sitename=false
                              ),
@@ -23,6 +24,11 @@ makedocs(
             "Single-qubit gates s" => "0_Single-qubit-gates.md",
             "Two-qubit gates" => "1_Two-qubit-gates.md",
         ],        
+        "Novel algorithm to Simulation on NISQ device" => [
+            "Problem definition" => "Simulation/problem_definition.md",
+            "U4 - Cartan's KAK decomposition" => "Simulation/U4_Cartan_decomposition.md",
+            "Algorithm description" => "Simulation/Trotterization.md",
+        ],
         "Library References" => [
             "QCircuits" => [
                 "Circuit" => "QCircuits/Circuit.md",
@@ -51,6 +57,3 @@ deploydocs(
     repo = "github.com/Adgnitio/QuantumCircuits.jl",
     push_preview = true
 )
-
-
-
