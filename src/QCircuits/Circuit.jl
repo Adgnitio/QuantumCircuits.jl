@@ -35,7 +35,7 @@ import QuantumCircuits.QCircuits.QBase: add!, tomatrix, setparameters!, simplify
        standardGateError, decompose, measure!, bindparameters!
 import Base.show
 
-export QCircuit, getparameters, getRandParameters, toString, setClassicalRegister!
+export QCircuit, getparameters, getRandParameters, toString, setClassicalRegister!, toPythonQiskitCode
 
 "Nothing function"
 const nop = () -> nothing
@@ -377,6 +377,51 @@ function toQiskit(circuit::QCircuit)
     end
 
     return qc
+end
+
+"Function to convert QCircuit to Python code using Qiskit library."
+function toPythonQiskitCode(circuit::QCircuit)
+    code = ""
+
+    args = ""
+    for (i, r) in enumerate(circuit.qRegisters)
+        if isnothing(r.name)
+            code *= "qr$i = QuantumRegister($(length(r.bits)))\n"
+        else
+            code *= "qr$i = QuantumRegister($(length(r.bits)), \"$(r.name)\")\n"
+        end
+        if i > 1
+            args *= ", "
+        end
+        args *= "qr$i"
+    end
+
+    if !isempty(circuit.cRegisters)
+        args *= ", "
+        for (i, r) in enumerate(circuit.cRegisters)
+            if isnothing(r.name)
+                code *= "cr$i = ClassicalRegister($(length(r.bits)))\n"
+            else
+                code *= "cr$i = ClassicalRegister($(length(r.bits)), \"$(r.name)\")\n"
+            end
+            if i > 1
+                args *= ", "
+            end
+            args *= "cr$i"
+        end
+    end
+
+    code *= "qc = QuantumCircuit($args)\n"
+
+    for gate in getCode(circuit)
+        code *= getPythonCode("qc", gate)
+    end
+
+    for (q, c) in circuit.measures
+        code *= "qc.measure($q, $(getid(c)))\n"
+    end
+
+    return code
 end
 
 "Show method"

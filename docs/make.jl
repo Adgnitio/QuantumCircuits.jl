@@ -29,6 +29,9 @@ makedocs(
             "U4 - Cartan's KAK decomposition" => "Simulation/U4_Cartan_decomposition.md",
             "Algorithm description" => "Simulation/Trotterization.md",
         ],
+        "Examples" => [
+            "Log-Normal state preparation" => "examples/state_preparation.md",
+        ],        
         "Library References" => [
             "QCircuits" => [
                 "Circuit" => "QCircuits/Circuit.md",
