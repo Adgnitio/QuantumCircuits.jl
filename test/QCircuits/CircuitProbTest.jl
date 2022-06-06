@@ -40,6 +40,5 @@ circ_cr = ClassicalRegister(circ_N)
 circ = QCircuit(circ_qr, circ_cr)
 circ.u3(0, 1.3537, 2.5652, 5.5142)
 
-@test execute(circ) == calcQiskitStateVector(circ)
-
+@test sum(abs.(execute(circ) - calcQiskitStateVector(circ))) < 1e-6
 
