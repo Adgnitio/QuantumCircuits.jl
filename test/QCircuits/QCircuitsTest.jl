@@ -22,4 +22,5 @@ include("OtherGatesTest.jl")
 include("CircuitMeasureTest.jl")
 include("GraphTest.jl")
 include("CircuitPythonTest.jl")
+include("CircuitProbTest.jl")
 

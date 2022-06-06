@@ -20,26 +20,26 @@ using QuantumCircuits.QCircuits.Circuit
 using QuantumCircuits.QCircuits.Circuit: toQiskit
 using QuantumCircuits.QCircuits.Qiskit
 using QuantumCircuits.QCircuits.Qiskit: qiskit
+using QuantumCircuits.Execute
+
+statevectorsim = qiskit.Aer.get_backend("statevector_simulator")
+
+function calcQiskitStateVector(qc)
+    qcirc = toQiskit(qc)
+
+    statevector = qiskit.execute(qcirc.qc, statevectorsim).result().get_statevector()
+    return statevector.probabilities()    
+end
 
 ################################################################################
 #  U3                                                                          #
 ################################################################################
+circ_N = 1
+circ_qr = QuantumRegister(circ_N)
+circ_cr = ClassicalRegister(circ_N)
+circ = QCircuit(circ_qr, circ_cr)
+circ.u3(0, 1.3537, 2.5652, 5.5142)
 
-# circ_N = 1
-# circ_qr = QuantumRegister(circ_N)
-# circ_cr = ClassicalRegister(circ_N)
-# circ = QCircuit(circ_qr, circ_cr)
-# circ.u3(0, 1.3537, 2.5652, 5.5142)
-# #circ.measure(0, 0)
+@test execute(circ) == calcQiskitStateVector(circ)
 
-# start = ket"0"
-# mat = tomatrix(circ)
-# opt_p = circ.measures_matrix * state2probability(mat * start)
 
-# qcirc = toQiskit(circ)
-
-# execute(qc)
-
-# statevectorsim = qiskit.Aer.get_backend("statevector_simulator")
-# statevector = qiskit.execute(qcirc.qc, statevectorsim).result().get_statevector()
-# prob = statevector.probabilities()

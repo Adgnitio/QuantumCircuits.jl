@@ -145,12 +145,20 @@ end
 "Generate phyton code for qisit."
 getPythonCode(_, gate) = error("Not implemented getPythonCode for gate $gate")
 getPythonCode(qc, gate::X) = "$qc.x($(getid(gate.qubit)))\n"
+getPythonCode(qc, gate::Sx) = "$qc.sx($(getid(gate.qubit)))\n"
+getPythonCode(qc, gate::Y) = "$qc.y($(getid(gate.qubit)))\n"
+getPythonCode(qc, gate::Z) = "$qc.z($(getid(gate.qubit)))\n"
+getPythonCode(qc, gate::S) = "$qc.s($(getid(gate.qubit)))\n"
+getPythonCode(qc, gate::Sd) = "$qc.sdg($(getid(gate.qubit)))\n"
+getPythonCode(qc, gate::T) = "$qc.t($(getid(gate.qubit)))\n"
+getPythonCode(qc, gate::Td) = "$qc.tdg($(getid(gate.qubit)))\n"
 getPythonCode(qc, gate::H) = "$qc.h($(getid(gate.qubit)))\n"
 getPythonCode(qc, cx::CX) = "$qc.cx($(getid(cx.control)), $(getid(cx.target)))\n"
 getPythonCode(qc, gate::U3) = "$qc.u3($(getvalue(gate.θ)), $(getvalue(gate.ϕ)), $(getvalue(gate.λ)), $(getid(gate.qubit)))\n"
 getPythonCode(qc, gate::Ry) = "$qc.ry($(getvalue(gate.θ)), $(getid(gate.qubit)))\n"
 getPythonCode(qc, gate::Rz) = "$qc.rz($(getvalue(gate.θ)), $(getid(gate.qubit)))\n"
 getPythonCode(qc, gate::Rx) = "$qc.rx($(getvalue(gate.θ)), $(getid(gate.qubit)))\n"
+getPythonCode(qc, gate::Rzx) = "$qc.rzx($(getvalue(gate.θ)), $(getid(gate.qubit)))\n"
 
 "Add gate to circuit"
 function add!(qc::QiskitCircuit, gate::QuantumGate)
