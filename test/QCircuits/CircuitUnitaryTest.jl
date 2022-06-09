@@ -141,8 +141,8 @@ end
 ################################################################################
 #  CX                                                                          #
 ################################################################################
-function test_unitary(qubits, gates, expected_param=0)
-    circ = QCircuit(qubits)
+function test_unitary(qubits, gates, expected_param=0; inline_optimization=true)
+    circ = QCircuit(qubits, inline_optimization=inline_optimization)
     for (g, args) in gates
         add!(circ, g, args...)
     end
@@ -178,5 +178,5 @@ test_unitary(6, [(H, [0]), (H, [1]), (CX, [2, 3]), (S, [0]), (Y, [1]),
 ################################################################################
 test_unitary(1, [(U3, (0, ParameterT(π/4), ParameterT(π/2), ParameterT(π)))], 3)
 test_unitary(1, [(U3, (0, ParameterT(-π/4), ParameterT(-π/2), ParameterT(-π)))], 3)
-test_unitary(1, [(U3, (0, ParameterT(π/4), ParameterT(π/2), ParameterT(π))), (U3, (0, ParameterT(-π/4), ParameterT(-π/2), ParameterT(-π)))], 6)
+test_unitary(1, [(U3, (0, ParameterT(π/4), ParameterT(π/2), ParameterT(π))), (U3, (0, ParameterT(-π/4), ParameterT(-π/2), ParameterT(-π)))], 6, inline_optimization=false)
 test_unitary(2, [(U3, (0, ParameterT(π/4), ParameterT(π/2), ParameterT(π))), (CX, [1, 0]), (U3, (1, ParameterT(-π/4), ParameterT(-π/2), ParameterT(-π)))], 6)

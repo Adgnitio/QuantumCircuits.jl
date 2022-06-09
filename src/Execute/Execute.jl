@@ -36,6 +36,9 @@ struct QiskitQuantum <: QuantumDevice
 end
 QiskitQuantum() = QiskitQuantum(qiskit.providers.aer.QasmSimulator())
 
+
+
+const InnerJuliaQuantumSimulator = QuantumSimulator()
 ######################################################
 
 # Initial stata
@@ -81,6 +84,11 @@ function execute(::QuantumSimulator, qc::QCircuit, params=nothing; prev_matrix=n
 
     p = state2probability(m * s)
     return qc.measures_matrix * p
+end
+
+"Function execute the quantum circuit on simulator"
+function execute(qc::QCircuit, params=nothing)
+    return execute(InnerJuliaQuantumSimulator, qc, params)
 end
 
 

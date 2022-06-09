@@ -35,7 +35,7 @@ import QuantumCircuits.QCircuits.QBase: add!, tomatrix, setparameters!, simplify
        standardGateError, decompose, measure!, bindparameters!
 import Base.show
 
-export QCircuit, getparameters, getRandParameters, toString, setClassicalRegister!
+export QCircuit, getparameters, getRandParameters, toString, setClassicalRegister!, toPythonQiskitCode
 
 "Nothing function"
 const nop = () -> nothing
@@ -83,10 +83,10 @@ mutable struct QCircuit <: QuantumCircuit
     measures::Vector{Pair{Qubit, Cbit}}
     measures_matrix::Matrix{Float64}
 
-    function QCircuit(qRegs::Vector{QuantumRegister}, cRegs::Vector{ClassicalRegister})
+    function QCircuit(qRegs::Vector{QuantumRegister}, cRegs::Vector{ClassicalRegister}; inline_optimization=true)
         n = sum([length(i) for i in qRegs])
 
-        qc = new(n, qRegs, cRegs, DirectedGraph{Int}(n), false, QuantumGate[], Qubit[], ClassicalRegister[], Pair{Qubit, Cbit}[], eye(2^n))
+        qc = new(n, qRegs, cRegs, DirectedGraph{Int}(n, inline_optimization), false, QuantumGate[], Qubit[], ClassicalRegister[], Pair{Qubit, Cbit}[], eye(2^n))
 
         # assign the qregister to circuit
         for r in qRegs
@@ -107,11 +107,11 @@ mutable struct QCircuit <: QuantumCircuit
         return qc
     end
 end
-QCircuit(n::Integer) = QCircuit([QuantumRegister(n)], [ClassicalRegister(n)])
-QCircuit(qReg::QuantumRegister, cReg::ClassicalRegister) = QCircuit([qReg], [cReg])
-QCircuit(reg::QuantumRegister) = QCircuit([reg], ClassicalRegister[])
-QCircuit(regs::Vector{QuantumRegister}) = QCircuit(regs, [ClassicalRegister(sum([length(i) for i in regs]))])
-QCircuit(regs::Vector{QuantumRegister}, cReg::ClassicalRegister) = QCircuit(regs, [cReg])
+QCircuit(n::Integer; inline_optimization=true) = QCircuit([QuantumRegister(n)], [ClassicalRegister(n)], inline_optimization=inline_optimization)
+QCircuit(qReg::QuantumRegister, cReg::ClassicalRegister; inline_optimization=true) = QCircuit([qReg], [cReg], inline_optimization=inline_optimization)
+QCircuit(reg::QuantumRegister; inline_optimization=true) = QCircuit([reg], ClassicalRegister[], inline_optimization=inline_optimization)
+QCircuit(regs::Vector{QuantumRegister}; inline_optimization=true) = QCircuit(regs, [ClassicalRegister(sum([length(i) for i in regs]))], inline_optimization=inline_optimization)
+QCircuit(regs::Vector{QuantumRegister}, cReg::ClassicalRegister; inline_optimization=true) = QCircuit(regs, [cReg], inline_optimization=inline_optimization)
 function QCircuit(qc::QCircuit)
     qregs = [QuantumRegister(length(r), r.name) for r in qc.qRegisters]
     cregs = [ClassicalRegister(length(r), r.name) for r in qc.cRegisters]
@@ -377,6 +377,51 @@ function toQiskit(circuit::QCircuit)
     end
 
     return qc
+end
+
+"Function to convert QCircuit to Python code using Qiskit library."
+function toPythonQiskitCode(circuit::QCircuit)
+    code = ""
+
+    args = ""
+    for (i, r) in enumerate(circuit.qRegisters)
+        if isnothing(r.name)
+            code *= "qr$i = QuantumRegister($(length(r.bits)))\n"
+        else
+            code *= "qr$i = QuantumRegister($(length(r.bits)), \"$(r.name)\")\n"
+        end
+        if i > 1
+            args *= ", "
+        end
+        args *= "qr$i"
+    end
+
+    if !isempty(circuit.cRegisters)
+        args *= ", "
+        for (i, r) in enumerate(circuit.cRegisters)
+            if isnothing(r.name)
+                code *= "cr$i = ClassicalRegister($(length(r.bits)))\n"
+            else
+                code *= "cr$i = ClassicalRegister($(length(r.bits)), \"$(r.name)\")\n"
+            end
+            if i > 1
+                args *= ", "
+            end
+            args *= "cr$i"
+        end
+    end
+
+    code *= "qc = QuantumCircuit($args)\n"
+
+    for gate in getCode(circuit)
+        code *= getPythonCode("qc", gate)
+    end
+
+    for (q, c) in circuit.measures
+        code *= "qc.measure($q, $(getid(c)))\n"
+    end
+
+    return code
 end
 
 "Show method"
