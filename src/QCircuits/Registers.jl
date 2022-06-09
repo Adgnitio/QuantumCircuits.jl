@@ -15,13 +15,16 @@ module Registers
 using QuantumCircuits.QCircuits.QBase
 
 export Bit, Qubit, Cbit, Register, ClassicalRegister, QuantumRegister,
-       getid, setid
+       QuantumNumber, QuantumAbstractRegister, getid, setid
 
 "The abstract bit"
 abstract type Bit end
 
 "The abstract register"
 abstract type Register <: AbstractVector{Int} end
+
+"The quantum abstract register"
+abstract type QuantumAbstractRegister <: Register end
 
 "Classical bit"
 mutable struct Cbit <: Bit
@@ -75,23 +78,54 @@ function setid(b::Bit, id::Integer)
 end
 
 "Register macro"
-macro register(name, bit)
+macro register(name, bit, basetype)
     eval(quote
-        struct $name <: Register
+        struct $name <: $basetype
             name::Union{String, Nothing}
             bits::Vector{$bit}
 
             $name(n::Integer, name::Union{String, Nothing}) = new(name, [$bit(i) for i in 0:(n-1)])
         end
         $name(n::Integer) = $name(n, nothing)
+        function Base.show(io::IO, reg::$name)
+            if isnothing(reg.name)
+                Base.show(io, string($name) * "($(length(reg)))")
+            else
+                Base.show(io, string($name) * "($(reg.name), $(length(reg)))")
+            end
+        end
     end)
 end
+Base.show(io::IO, ::MIME{Symbol("text/plain")}, reg::Register) = show(io::IO, reg)
 
 # Classical Register
-@register(ClassicalRegister, Cbit)
+@register(ClassicalRegister, Cbit, Register)
 # Quantum Register
-@register(QuantumRegister, Qubit)
+@register(QuantumRegister, Qubit, QuantumAbstractRegister)
 
+# Quantum Register for store Numbers
+struct QuantumNumber <: QuantumAbstractRegister
+    name::Union{String, Nothing}
+    integer::Integer # integer part precision
+    fractional::Integer # fractional part precision
+    bits::Vector{Qubit}
+
+
+    QuantumNumber(integer::Integer, fractional::Integer, name::Union{String, Nothing}) = 
+        new(name,
+            integer,
+            fractional,
+            [Qubit(i) for i in 0:(integer + fractional - 1)])
+end
+QuantumNumber(integer::Integer, fractional::Integer) = QuantumNumber(integer, fractional, nothing)
+QuantumNumber(integer::Integer) = QuantumNumber(integer, 0, nothing)
+function Base.show(io::IO, reg::QuantumNumber)
+    if isnothing(reg.name)
+        Base.show(io, "QuantumNumber($(reg.integer), $(reg.fractional))")
+    else
+        Base.show(io, "QuantumNumber($(reg.name), $(reg.integer), $(reg.fractional))")
+    end
+end
 
 "The size of register."
 Base.length(reg::Register) = length(reg.bits)
@@ -104,7 +138,7 @@ Base.eachindex(reg::Register) = 0:(length(reg)-1)
 
 "Get bit from register on given index."
 function Base.getindex(reg::Register, idx::Integer)
-    @assert idx < length(reg) "The index $idx is out of bound for register $(reg.name)."
+    @assert idx < length(reg) "The index $idx is out of bound for register $(reg.name) with length $(length(reg))."
 
     return reg.bits[idx + 1]
 end

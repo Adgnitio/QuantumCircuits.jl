@@ -20,7 +20,7 @@ import Base: show, length, inv
 import QuantumCircuits.QCircuits.QBase: tomatrix, setparameters!, simplify,
        standardGateError, decompose, bindparameters!
 
-export X, Y, Z, S, Sd, T, Td, H, CX, U3, Rx, Ry, Rz, U, Sx, Sxd,
+export X, Y, Z, S, Sd, T, Td, H, CX, U3, Rx, Ry, Rz, U, Sx, Sxd, P, CP,
       getqubits, getqubitsids, toU3,
       ChromosomeGate, DNAGate, Parameters, getArgs, decompose,
       ParameterT, getvalue
@@ -303,6 +303,47 @@ function Base.:(>)(x::CX, y::CX)
 end
 getArgs(g::CX) = (getid(g.control), getid(g.target))
 
+@doc raw"""
+    CP(control::Qubit, target::Qubit)
+This is a diagonal and symmetric gate that induces a phase on the state of the target qubit, depending on the control state.
+**Circuit Representation**
+```
+q_0: ─■──
+      │λ
+q_1: ─■──
+```
+**Matrix Representation**
+```math
+CP = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 0 & e^{i\lambda}
+    \end{pmatrix}
+```
+
+```julia
+qc = QCircuit(2)
+qc.cp(0, 1)
+```
+"""
+struct CP <: QuantumGate
+    control::Qubit
+    target::Qubit
+    λ::Parameter
+end
+Base.:(==)(g1::CP, g2::CP) = g1.control == g2.control && g1.target == g2.target
+Base.hash(g::CP, h::UInt) = hash((g.control, g.target), h)
+function Base.:(>)(x::CP, y::CP)
+    if x.control == y.control
+        return x.target > y.target
+    else
+        return x.control > y.control
+    end
+end
+getArgs(g::CP) = (getid(g.control), getid(g.target), g.λ)
+
+
 "Rotation gates"
 abstract type RotationGate <: QuantumGate end
 
@@ -413,6 +454,8 @@ Rz(\theta) = exp(-i\th Z) =
     e^{-i\th} & 0 \\
     0 & e^{i\th}
 \end{pmatrix}
+```
+
 ```julia
 qc = QCircuit(1)
 qc.rz(0, π/2)
@@ -437,6 +480,59 @@ qc.rz(0)
 findparam(expmat, qc)
 
 ```
+""")
+
+@rotationGate(P,
+raw"""
+    P(qubit::Qubit, θ::Parameter)
+A single-qubit Pauli gate which represents rotation about the Z axis.
+This is a diagonal gate. It can be implemented virtually in hardware via framechanges (i.e. at zero error and duration).
+
+**Matrix Representation**
+```math
+P(\theta) = 
+\begin{pmatrix}
+    1 & 0 \\
+    0 & e^{i\theta}
+\end{pmatrix}
+```
+
+Please note that:
+```math
+P(\theta = \pi) = Z
+```
+```math
+P(\theta = \pi/2) = S
+```
+```math
+P(\theta = \pi/4) = T
+```
+
+```julia
+qc = QCircuit(1)
+qc.p(0, π/2)
+```
+
+You can also create a gate without adding parameter, in that case, it will be initialized by random values and can be used in Quantum Machine Learning as the loss function parameters.
+```julia
+using QuantumCircuits
+using QuantumCircuits.QML
+using QuantumCircuits.Execute
+
+# Expected circuit
+expqc = QCircuit(1)
+expqc.z(0)
+expmat = tomatrix(expqc)
+
+# The ansact
+qc = QCircuit(1)
+qc.p(0)
+
+# Find the parameters which fit the expected unitary matrix in the best way.
+findparam(expmat, qc)
+```
+
+Reference for virtual Z gate implementation: https://arxiv.org/abs/1612.00858
 """)
 
 appendparams!(param, gate::RotationGate) = appendparams!(param, gate.θ)
@@ -567,6 +663,7 @@ getqubits(gate::CX) = (gate.control, gate.target)
 "Return the qubits ids on which operate the gate"
 getqubitsids(gate::QuantumGate) = (getid(gate.qubit),) # All Single Qubit Gates has qubit field
 getqubitsids(gate::CX) = (getid(gate.control), getid(gate.target))
+getqubitsids(gate::CP) = (getid(gate.control), getid(gate.target))
 
 "Show method"
 Base.show(io::IO, gate::QuantumGate) = print(io, "$(typeof(gate))($(gate.qubit))")
@@ -590,6 +687,8 @@ Rxmatrix(θ) = [cos(θ/2)+0im -1im * sin(θ/2); -1im * sin(θ/2) cos(θ/2)]
 Rymatrix(θ) = [cos(θ/2)+0im -sin(θ/2); sin(θ/2) cos(θ/2)]
 # exp(-1im * θ/2) * u1matrix(θ)
 Rzmatrix(θ) = [cis(-θ/2) 0; 0 cis(θ/2)]
+# exp(-1im * θ/2) * u1matrix(θ)
+Pmatrix(θ) = cis(θ/2) * Rzmatrix(θ)
 # Universary matrix
 umatrix(β, γ, δ) = Rzmatrix(β) * Rymatrix(γ) * Rzmatrix(δ)
 
@@ -630,6 +729,7 @@ end
 tomatrix(gate::Rx) = Rxmatrix(getvalue(gate.θ))
 tomatrix(gate::Ry) = Rymatrix(getvalue(gate.θ))
 tomatrix(gate::Rz) = Rzmatrix(getvalue(gate.θ))
+tomatrix(gate::P) = Pmatrix(getvalue(gate.θ))
 function tomatrix(::Rx, param)
     @assert length(param) == 1 "Rx has 1 parameters but $(length(param)) was provided."
     Rxmatrix(param[1])
@@ -641,6 +741,10 @@ end
 function tomatrix(::Rz, param)
     @assert length(param) == 1 "Rz has 1 parameters but $(length(param)) was provided."
     Rzmatrix(param[1])
+end
+function tomatrix(::P, param)
+    @assert length(param) == 1 "P has 1 parameters but $(length(param)) was provided."
+    Pmatrix(param[1])
 end
 
 tomatrix(gate::U) = umatrix(gate.β, gate.γ, gate.δ)
@@ -835,7 +939,9 @@ inv(gate::Y) = gate
 inv(gate::Rx) = Rx(gate.qubit, neg(gate.θ))
 inv(gate::Ry) = Ry(gate.qubit, neg(gate.θ))
 inv(gate::Rz) = Rz(gate.qubit, neg(gate.θ))
+inv(gate::P) = P(gate.qubit, neg(gate.θ))
 inv(gate::CX) = gate
+inv(gate::CP) = CP(gate.control, gate.target, neg(gate.λ))
 inv(gate::T) = Td(gate.qubit)
 inv(gate::S) = Sd(gate.qubit)
 inv(gate::Td) = T(gate.qubit)

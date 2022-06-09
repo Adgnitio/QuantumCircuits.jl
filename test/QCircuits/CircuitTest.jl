@@ -17,7 +17,7 @@ using QuantumCircuits
 using QuantumCircuits.QML
 
 using LinearAlgebra: I
-using QuantumCircuits.QCircuits.Gates: Rx, Ry, Rz
+using QuantumCircuits.QCircuits.Gates: Rx, Ry, Rz, P
 using QuantumCircuits.QCircuits.Math
 
 
@@ -35,7 +35,7 @@ setparameters!(qc, [1.5, 2.5, 3.5, 4.5, 5.5, 6.5])
 
 ################################################################################
 # Rotations
-gates = [Rx, Ry, Rz]
+gates = [Rx, Ry, Rz, P]
 θs = [0, π/4, π/2, π]
 
 for g in gates
@@ -108,6 +108,10 @@ qc = QCircuit(1)
 qc.rz(0, π/2)
 check_inv(qc)
 
+qc = QCircuit(1)
+qc.p(0, π/2)
+check_inv(qc)
+
 qc = QCircuit(2)
 qc.ry(0, π)
 qc.cx(0, 1)
@@ -137,6 +141,14 @@ qc.cx(1, 0)
 qc.u3(1, π/2, π/4, π/8)
 check_inv(qc)
 
+function check_inv_decom(qc)
+    err = matrix_norm(tomatrix(decompose(inv(qc))) * tomatrix(decompose(qc)) - I)
+    @test abs(err) < 1e-16
+end
+qc = QCircuit(2)
+qc.x([0, 1])
+qc.cp(1, 0, π/2)
+check_inv_decom(qc)
 
 ################################################################################
 #  Append                                                                     #
@@ -152,6 +164,7 @@ qc2.cx(0, 1)
 qc2.rx(0, 4.0)
 qc2.ry(1, 5.0)
 qc2.rz(1, 6.0)
+qc2.p(1, 7.0)
 
 testqc = QCircuit(2)
 testqc.x(0)
@@ -162,6 +175,7 @@ testqc.cx(0, 1)
 testqc.rx(0, 4.0)
 testqc.ry(1, 5.0)
 testqc.rz(1, 6.0)
+testqc.p(1, 7.0)
 
 append!(qc1, qc2)
 

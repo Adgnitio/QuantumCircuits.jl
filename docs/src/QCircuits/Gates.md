@@ -7,6 +7,7 @@ Filter = t -> !(typeof(t) === DataType && t in Set([
     QuantumCircuits.QCircuits.Gates.Rx,
     QuantumCircuits.QCircuits.Gates.Ry,
     QuantumCircuits.QCircuits.Gates.Rz,
+    QuantumCircuits.QCircuits.Gates.P,
     QuantumCircuits.QCircuits.Gates.H,
     QuantumCircuits.QCircuits.Gates.X,
     QuantumCircuits.QCircuits.Gates.Y,
@@ -17,5 +18,6 @@ Filter = t -> !(typeof(t) === DataType && t in Set([
     QuantumCircuits.QCircuits.Gates.Td,
     QuantumCircuits.QCircuits.Gates.Sx,
     QuantumCircuits.QCircuits.Gates.Sxd,
-    QuantumCircuits.QCircuits.Gates.CX,]))
+    QuantumCircuits.QCircuits.Gates.CX,
+    QuantumCircuits.QCircuits.Gates.CP,]))
 ```

@@ -73,7 +73,7 @@ c0: 3/═══════════════
 """
 mutable struct QCircuit <: QuantumCircuit
     qubits::Int
-    qRegisters::Vector{QuantumRegister}
+    qRegisters::Vector{QuantumAbstractRegister}
     cRegisters::Vector{ClassicalRegister}
     dcg::DirectedGraph{Int}
     has_code::Bool
@@ -83,7 +83,7 @@ mutable struct QCircuit <: QuantumCircuit
     measures::Vector{Pair{Qubit, Cbit}}
     measures_matrix::Matrix{Float64}
 
-    function QCircuit(qRegs::Vector{QuantumRegister}, cRegs::Vector{ClassicalRegister}; inline_optimization=true)
+    function QCircuit(qRegs::Vector{<:QuantumAbstractRegister}, cRegs::Vector{ClassicalRegister}; inline_optimization=true)
         n = sum([length(i) for i in qRegs])
 
         qc = new(n, qRegs, cRegs, DirectedGraph{Int}(n, inline_optimization), false, QuantumGate[], Qubit[], ClassicalRegister[], Pair{Qubit, Cbit}[], eye(2^n))
@@ -108,10 +108,10 @@ mutable struct QCircuit <: QuantumCircuit
     end
 end
 QCircuit(n::Integer; inline_optimization=true) = QCircuit([QuantumRegister(n)], [ClassicalRegister(n)], inline_optimization=inline_optimization)
-QCircuit(qReg::QuantumRegister, cReg::ClassicalRegister; inline_optimization=true) = QCircuit([qReg], [cReg], inline_optimization=inline_optimization)
-QCircuit(reg::QuantumRegister; inline_optimization=true) = QCircuit([reg], ClassicalRegister[], inline_optimization=inline_optimization)
-QCircuit(regs::Vector{QuantumRegister}; inline_optimization=true) = QCircuit(regs, [ClassicalRegister(sum([length(i) for i in regs]))], inline_optimization=inline_optimization)
-QCircuit(regs::Vector{QuantumRegister}, cReg::ClassicalRegister; inline_optimization=true) = QCircuit(regs, [cReg], inline_optimization=inline_optimization)
+QCircuit(qReg::QuantumAbstractRegister, cReg::ClassicalRegister; inline_optimization=true) = QCircuit([qReg], [cReg], inline_optimization=inline_optimization)
+QCircuit(reg::QuantumAbstractRegister; inline_optimization=true) = QCircuit([reg], ClassicalRegister[], inline_optimization=inline_optimization)
+QCircuit(regs::Vector{<:QuantumAbstractRegister}; inline_optimization=true) = QCircuit(regs, [ClassicalRegister(sum([length(i) for i in regs]))], inline_optimization=inline_optimization)
+QCircuit(regs::Vector{<:QuantumAbstractRegister}, cReg::ClassicalRegister; inline_optimization=true) = QCircuit(regs, [cReg], inline_optimization=inline_optimization)
 function QCircuit(qc::QCircuit)
     qregs = [QuantumRegister(length(r), r.name) for r in qc.qRegisters]
     cregs = [ClassicalRegister(length(r), r.name) for r in qc.cRegisters]
@@ -120,7 +120,7 @@ function QCircuit(qc::QCircuit)
 end
 
 ###################################################################################
-@cbooify QCircuit (x, sx, y, z, h, cx, s, sdg, t, tdg, u, u3, rx, ry, rz, rzx, u4, barrier, measure)
+@cbooify QCircuit (x, sx, y, z, h, cx, s, sdg, t, tdg, u, u3, rx, ry, rz, p, cp, rzx, u4, barrier, measure, add!)
 
 "Add function macro"
 macro addfunction(name, gate)
@@ -154,15 +154,20 @@ end
 @addfunction1param(rx, Rx)
 @addfunction1param(ry, Ry)
 @addfunction1param(rz, Rz)
+@addfunction1param(p, P)
 
 @addfunction3param(u3, U3)
 
 rzx(qc::QCircuit, q1, q2, θ=ParameterT(rand()*2π)) = add!(qc, Rzx, q1, q2, θ)
 u4(qc::QCircuit, q1, q2, params=[ParameterT(rand() * 2π) for i in 1:U4_params]) = add!(qc, U4, q1, q2, params)
+cp(qc::QCircuit, q1, q2, λ=ParameterT(rand()*2π)) = add!(qc, CP, q1, q2, λ)
 
 barrier(qc::QCircuit) = add!(qc, Barrier(qc.vqubits))
 measure(qc::QCircuit, q, c) = measure!(qc, q, c)
 
+function add!(qc::QCircuit, reg::QuantumNumber, num::Integer)
+    println("Test")
+end
 
 ###################################################################################
 
@@ -539,6 +544,21 @@ function decompose(qc::QCircuit)
     end
 
     return newqc
+end
+
+function decompose(gate::CP)
+#      ┌────────┐
+# q_0: ┤ P(λ/2) ├──■───────────────■────────────
+#      └────────┘┌─┴─┐┌─────────┐┌─┴─┐┌────────┐
+# q_1: ──────────┤ X ├┤ P(-λ/2) ├┤ X ├┤ P(λ/2) ├
+#                └───┘└─────────┘└───┘└────────┘   
+    return [
+        P(gate.control, gate.λ),
+        CX(gate.control, gate.target),
+        P(gate.target, gate.λ),
+        CX(gate.control, gate.target),
+        P(gate.target, gate.λ)
+    ]
 end
 
 function simplify(qc::QCircuit)

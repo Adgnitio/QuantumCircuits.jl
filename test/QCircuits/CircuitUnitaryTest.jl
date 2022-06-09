@@ -17,7 +17,7 @@ using QuantumCircuits.QML
 
 using QuantumCircuits.QCircuits.Math
 using QuantumCircuits.QCircuits.Circuit: toQiskit
-using QuantumCircuits.QCircuits.Gates: Rx, Ry, Rz, X, Y, Z, S, Sd, T, Td, H, CX, U3
+using QuantumCircuits.QCircuits.Gates: Rx, Ry, Rz, X, Y, Z, S, Sd, T, Td, H, CX, U3, P, CP
 
 import Zygote
 
@@ -32,7 +32,7 @@ end
 ################################################################################
 #  1 qubit, rotation gate                                                      #
 ################################################################################
-gates = [Rx, Ry, Rz]
+gates = [Rx, Ry, Rz, P]
 θs = [0, π/4, π/2, 3π/4, π, 5π/4, 3π/2, 7π/4, 2π]
 
 for g in gates
@@ -141,10 +141,13 @@ end
 ################################################################################
 #  CX                                                                          #
 ################################################################################
-function test_unitary(qubits, gates, expected_param=0; inline_optimization=true)
+function test_unitary(qubits, gates, expected_param=0; inline_optimization=true, usedecompose=false)
     circ = QCircuit(qubits, inline_optimization=inline_optimization)
     for (g, args) in gates
         add!(circ, g, args...)
+    end
+    if usedecompose
+        circ = decompose(circ)
     end
     @test unitary_error(tomatrix(toQiskit(circ)), tomatrix(circ)) < 1e-8
     test_derivate(circ, expected_param)
@@ -180,3 +183,15 @@ test_unitary(1, [(U3, (0, ParameterT(π/4), ParameterT(π/2), ParameterT(π)))],
 test_unitary(1, [(U3, (0, ParameterT(-π/4), ParameterT(-π/2), ParameterT(-π)))], 3)
 test_unitary(1, [(U3, (0, ParameterT(π/4), ParameterT(π/2), ParameterT(π))), (U3, (0, ParameterT(-π/4), ParameterT(-π/2), ParameterT(-π)))], 6, inline_optimization=false)
 test_unitary(2, [(U3, (0, ParameterT(π/4), ParameterT(π/2), ParameterT(π))), (CX, [1, 0]), (U3, (1, ParameterT(-π/4), ParameterT(-π/2), ParameterT(-π)))], 6)
+
+################################################################################
+#  CP                                                                          #
+################################################################################
+λs = [0, π/4, π/2, 3π/4, π, 5π/4, 3π/2, 7π/4, 2π]
+
+for λ in λs
+    test_unitary(2, [(X, [0]), (X, [1]), (CP, (0, 1, λ))], usedecompose=true)
+    test_unitary(2, [(CP, (1, 0, λ))], usedecompose=true)
+    test_unitary(2, [(X, [0]), (X, [1]), (CP, (1, 0, λ))], usedecompose=true)
+end
+

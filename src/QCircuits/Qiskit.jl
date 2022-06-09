@@ -65,7 +65,7 @@ mutable struct QiskitCircuit <: QuantumCircuit
     cRegs::Dict{String, PyObject}
     draw::Function
 
-    function QiskitCircuit(qRegs::Vector{QuantumRegister},
+    function QiskitCircuit(qRegs::Vector{<:QuantumAbstractRegister},
                            cRegs::Union{Vector{ClassicalRegister}, Nothing} = nothing)
         qregs = [qiskit.QuantumRegister(length(r.bits), r.name) for r in qRegs]
         qubits = Dict{Qubit, PyObject}()
@@ -129,10 +129,12 @@ addQiskitCode(qc::QiskitCircuit, gate::Sd) = qc.qc.sdg(qc.qubits[gate.qubit])
 addQiskitCode(qc::QiskitCircuit, gate::T) = qc.qc.t(qc.qubits[gate.qubit])
 addQiskitCode(qc::QiskitCircuit, gate::Td) = qc.qc.tdg(qc.qubits[gate.qubit])
 addQiskitCode(qc::QiskitCircuit, cx::CX) = qc.qc.cx(qc.qubits[cx.control], qc.qubits[cx.target])
+addQiskitCode(qc::QiskitCircuit, cp::CP) = qc.qc.cp(cp.λ, qc.qubits[cp.control], qc.qubits[cp.target])
 addQiskitCode(qc::QiskitCircuit, gate::U3) = qc.qc.u3(getvalue(gate.θ), getvalue(gate.ϕ), getvalue(gate.λ), qc.qubits[gate.qubit])
 addQiskitCode(qc::QiskitCircuit, gate::Rx) = qc.qc.rx(getvalue(gate.θ), qc.qubits[gate.qubit])
 addQiskitCode(qc::QiskitCircuit, gate::Ry) = qc.qc.ry(getvalue(gate.θ), qc.qubits[gate.qubit])
 addQiskitCode(qc::QiskitCircuit, gate::Rz) = qc.qc.rz(getvalue(gate.θ), qc.qubits[gate.qubit])
+addQiskitCode(qc::QiskitCircuit, gate::P) = qc.qc.p(getvalue(gate.θ), qc.qubits[gate.qubit])
 addQiskitCode(qc::QiskitCircuit, gate::Rzx) = qc.qc.rzx(getvalue(gate.θ), qc.qubits[gate.qubit1], qc.qubits[gate.qubit2])
 addQiskitCode(qc::QiskitCircuit, ::Barrier) = qc.qc.barrier()
 function addQiskitCode(qc::QiskitCircuit, gate::U)

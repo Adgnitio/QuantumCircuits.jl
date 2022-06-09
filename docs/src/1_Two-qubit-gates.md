@@ -8,3 +8,8 @@ CurrentModule = QuantumCircuits.QCircuits.Gates
 ```@docs
 CX
 ```
+
+## CP
+```@docs
+CP
+```

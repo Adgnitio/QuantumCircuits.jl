@@ -88,3 +88,23 @@ qc.x([qr[0], qr[2]])
 qc.y(qr)
 
 @test length(getCode(qc)) == 7
+
+
+###############################################################
+
+using QuantumCircuits
+
+# num_a = QuantumNumber(3)
+# qc = QCircuit(num_a)
+
+# # Add 2 to register num_a
+# qc.add!(num_a, 2)
+
+###
+
+qc = QCircuit(3)
+qc.p(0, π)
+#qc.h(2)
+
+
+#qc.cp(pi/2, 1, 2)

@@ -33,29 +33,29 @@ First, we would like to fit the expected distribution. The use of entropy loos i
 
 ![image](../assets/simulation/overview.jpg)
 
-If the optimal parameters were found, the operator inverse of _**Ansact**_ transform the initial state into the state after the initialization and the two trotter steps. 
+If the optimal parameters were found, the operator inverse of _**Ansatz**_ transform the initial state into the state after the initialization and the two trotter steps. 
 
-Is worth noting that: if any circuit _T_ transforms the initial state $|000\rangle$ into some state $\psi$,  and we find any other _A_ circuit that transforms state $\psi$ into the $|000\rangle$ one we know that the inverse of the _A_ circuit creates the state $\psi$ from state $|000\rangle$ with accuracy to global phase (which is irrelevant and can be omitted). Note, that circuits _A_ and _T_ are not equivalent (so they unitary may not and usually are not equal), but this is ok for us we only would like to transform the given input state to the given output. And because these unitaries don't have to be equal, it is easy to prepare ansact and find the best parameters.
+Is worth noting that: if any circuit _T_ transforms the initial state $|000\rangle$ into some state $\psi$,  and we find any other _A_ circuit that transforms state $\psi$ into the $|000\rangle$ one we know that the inverse of the _A_ circuit creates the state $\psi$ from state $|000\rangle$ with accuracy to global phase (which is irrelevant and can be omitted). Note, that circuits _A_ and _T_ are not equivalent (so they unitary may not and usually are not equal), but this is ok for us we only would like to transform the given input state to the given output. And because these unitaries don't have to be equal, it is easy to prepare Ansatz and find the best parameters.
 
 So the circuits on figure below are equivalent.
 
 ![image](../assets/simulation/trotter_ansact.png)
 
-In the Figure below, you can find the ansact with 27 parameters used in the algorithm implementation.
+In the Figure below, you can find the Ansatz with 27 parameters used in the algorithm implementation.
 
 ![ansact.jpg](../assets/simulation/ansact.jpg)
 
 It is worth noting:
 * We are not looking for parameters that implement the whole unitary matrix of the 2 Trotter steps with the greatest accuracy, but only a transformation for a specific input state. This implies that it is relatively easy to find these parameters. 
-* Using the ansact, we can replace the circuit with 15 CNOT gates with the one with only 4 CNOT gates.
-* I use exactly the same ansact for all iterations but when can have different ansacts for other iterations.
+* Using the Ansatz, we can replace the circuit with 15 CNOT gates with the one with only 4 CNOT gates.
+* I use exactly the same Ansatz for all iterations but when can have different Ansatzs for other iterations.
 
 ## 3.1 Next step
 Then we do a similar step and try to find the parameters $\theta_2$ using the gradient descent method that make the circuit in the Figure below will finish at state $|0\rangle_3$.
 
 ![image](../assets/simulation/overview_next_step.jpg)
 
-If the optimal parameters $\theta_2$ were found, the operator inverse of _**Ansact**_ transform the initial state into the state after the initialization and the 4 trotter steps. So the circuits on Figure below are equivalent.
+If the optimal parameters $\theta_2$ were found, the operator inverse of _**Ansatz**_ transform the initial state into the state after the initialization and the 4 trotter steps. So the circuits on Figure below are equivalent.
 
 ![image](../assets/simulation/trotter_ansact_next.png)
 
