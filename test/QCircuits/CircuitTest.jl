@@ -150,6 +150,10 @@ qc.x([0, 1])
 qc.cp(1, 0, π/2)
 check_inv_decom(qc)
 
+qc = QCircuit(2)
+qc.swap(0, 1)
+check_inv_decom(qc)
+
 ################################################################################
 #  Append                                                                     #
 ################################################################################
@@ -165,6 +169,8 @@ qc2.rx(0, 4.0)
 qc2.ry(1, 5.0)
 qc2.rz(1, 6.0)
 qc2.p(1, 7.0)
+qc2.swap(0, 1)
+qc2.cp(0, 1, 8.0)
 
 testqc = QCircuit(2)
 testqc.x(0)
@@ -176,6 +182,8 @@ testqc.rx(0, 4.0)
 testqc.ry(1, 5.0)
 testqc.rz(1, 6.0)
 testqc.p(1, 7.0)
+testqc.swap(0, 1)
+testqc.cp(0, 1, 8.0)
 
 append!(qc1, qc2)
 

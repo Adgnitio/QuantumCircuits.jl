@@ -20,7 +20,7 @@ import Base: show, length, inv
 import QuantumCircuits.QCircuits.QBase: tomatrix, setparameters!, simplify,
        standardGateError, decompose, bindparameters!
 
-export X, Y, Z, S, Sd, T, Td, H, CX, U3, Rx, Ry, Rz, U, Sx, Sxd, P, CP,
+export X, Y, Z, S, Sd, T, Td, H, CX, U3, Rx, Ry, Rz, U, Sx, Sxd, P, CP, Swap,
       getqubits, getqubitsids, toU3,
       ChromosomeGate, DNAGate, Parameters, getArgs, decompose,
       ParameterT, getvalue
@@ -73,6 +73,8 @@ end
 "Quantum Universal Gate"
 abstract type UniversalGate <: QuantumGate end
 
+"Quantum Two qubits Gate, it is assumed that the structure contain fields 'control' and 'target'."
+abstract type TwoQubitsGate <: QuantumGate end
 
 "Comparator"
 Base.:(==)(c1::QuantumGate, c2::QuantumGate) = false
@@ -95,6 +97,7 @@ end
 raw"""
     X(qubit::Qubit)
 Single-qubit Pauli-X gate (``\sigma_x``), equivalent to [U3](@ref)(``\pi,0,\pi``)
+
 **Matrix Representation**
 ```math
 X = \begin{pmatrix}
@@ -112,6 +115,7 @@ qc.x(0)
 raw"""
     Y(qubit::Qubit)
 Single-qubit Pauli-Y gate (``\sigma_y``), equivalent to [U3](@ref)(``\pi,\frac{\pi}{2},\frac{\pi}{2}``)
+
 **Matrix Representation**
 ```math
 Y = \begin{pmatrix}
@@ -129,6 +133,7 @@ qc.y(0)
 raw"""
     Z(qubit::Qubit)
 Single-qubit Pauli-Z gate (``\sigma_z``), equivalent to [U3](@ref)(``0,0,\pi``)
+
 **Matrix Representation**
 ```math
 Z = \begin{pmatrix}
@@ -147,6 +152,7 @@ raw"""
     S(qubit::Qubit)
 Single-qubit S gate, equivalent to [U3](@ref)(``0,0,\frac{\pi}{2}``). This 
 gate is also referred to a square-root of Pauli-[Z](@ref).
+
 **Matrix Representation**
 ```math
 S = \begin{pmatrix}
@@ -165,6 +171,7 @@ raw"""
 Sd(qubit::Qubit)
 Single-qubit, hermitian conjugate of the [S](@ref). This is also an alternative square root of 
 the [Z](@ref). 
+
 **Matrix Representation**
 ```math
 S^{\dagger} = \begin{pmatrix}
@@ -182,6 +189,7 @@ qc.sd(0)
 raw"""
     H(qubit::Qubit)
 Single-qubit Hadamard gate, which is a ``\pi`` rotation about the X+Z axis, thus equivalent to [U3](@ref)(``\frac{\pi}{2},0,\pi``)
+
 **Matrix Representation**
 ```math
 H = \frac{1}{\sqrt{2}}
@@ -196,6 +204,7 @@ raw"""
     T(qubit::Qubit)
 Single-qubit T gate, equivalent to [U3](@ref)(``0,0,\frac{\pi}{4}``). This 
 gate is also referred to as a ``\frac{\pi}{8}`` gate or as a fourth-root of Pauli-[Z](@ref). 
+
 **Matrix Representation**
 ```math
 T = \begin{pmatrix}
@@ -214,6 +223,7 @@ raw"""
     Td(qubit::Qubit)
 Single-qubit, hermitian conjugate of the [T](@ref). This gate is equivalent to [U3](@ref)(``0,0,-\frac{\pi}{4}``). This 
 gate is also referred to as the fourth-root of Pauli-[Z](@ref). 
+
 **Matrix Representation**
 ```math
 T^{\dagger} = \begin{pmatrix}
@@ -231,6 +241,7 @@ qc.td(0)
 raw"""
     Sx(qubit::Qubit)
 Single-qubit square root of pauli-[X](@ref).
+
 **Matrix Representation**
 ```math
 \sqrt{X} = \frac{1}{2} \begin{pmatrix}
@@ -248,6 +259,7 @@ qc.sx(0)
 raw"""
     Sxd(qubit::Qubit)
 Single-qubit hermitian conjugate of the square root of pauli-[X](@ref), or the [Sx](@ref).
+
 **Matrix Representation**
 ```math
 \sqrt{X}^{\dagger} = \frac{1}{2} \begin{pmatrix}
@@ -266,6 +278,7 @@ qc.sxd(0)
     CX(control::Qubit, target::Qubit)
 Two-qubit controlled NOT gate with control and target on first and second qubits, respectively. This is also 
 called the controlled X gate. 
+
 **Circuit Representation**
 ```
 q_0: ──■──
@@ -288,7 +301,7 @@ qc = QCircuit(2)
 qc.cx(0, 1)
 ```
 """
-struct CX <: QuantumGate
+struct CX <: TwoQubitsGate
     control::Qubit
     target::Qubit
 end
@@ -306,6 +319,7 @@ getArgs(g::CX) = (getid(g.control), getid(g.target))
 @doc raw"""
     CP(control::Qubit, target::Qubit)
 This is a diagonal and symmetric gate that induces a phase on the state of the target qubit, depending on the control state.
+
 **Circuit Representation**
 ```
 q_0: ─■──
@@ -327,7 +341,7 @@ qc = QCircuit(2)
 qc.cp(0, 1)
 ```
 """
-struct CP <: QuantumGate
+struct CP <: TwoQubitsGate
     control::Qubit
     target::Qubit
     λ::Parameter
@@ -342,6 +356,48 @@ function Base.:(>)(x::CP, y::CP)
     end
 end
 getArgs(g::CP) = (getid(g.control), getid(g.target), g.λ)
+
+
+@doc raw"""
+    Swap(control::Qubit, target::Qubit)
+The swap gate.
+
+**Circuit Representation**
+```
+q_0: ─X─
+      │
+q_1: ─X─
+```
+
+**Matrix Representation**
+```math
+Swap = \begin{pmatrix}
+        1 & 0 & 0 & 0 \\
+        0 & 0 & 1 & 0 \\
+        0 & 1 & 0 & 0 \\
+        0 & 0 & 0 & 1
+    \end{pmatrix}
+```
+
+```julia
+qc = QCircuit(2)
+qc.swap(0, 1)
+```
+"""
+struct Swap <: TwoQubitsGate
+    control::Qubit
+    target::Qubit
+end
+Base.:(==)(g1::Swap, g2::Swap) = g1.control == g2.control && g1.target == g2.target
+Base.hash(g::Swap, h::UInt) = hash((g.control, g.target), h)
+function Base.:(>)(x::Swap, y::Swap)
+    if x.control == y.control
+        return x.target > y.target
+    else
+        return x.control > y.control
+    end
+end
+getArgs(g::Swap) = (getid(g.control), getid(g.target))
 
 
 "Rotation gates"
@@ -662,8 +718,7 @@ getqubits(gate::CX) = (gate.control, gate.target)
 
 "Return the qubits ids on which operate the gate"
 getqubitsids(gate::QuantumGate) = (getid(gate.qubit),) # All Single Qubit Gates has qubit field
-getqubitsids(gate::CX) = (getid(gate.control), getid(gate.target))
-getqubitsids(gate::CP) = (getid(gate.control), getid(gate.target))
+getqubitsids(gate::TwoQubitsGate) = (getid(gate.control), getid(gate.target))
 
 "Show method"
 Base.show(io::IO, gate::QuantumGate) = print(io, "$(typeof(gate))($(gate.qubit))")
@@ -942,6 +997,7 @@ inv(gate::Rz) = Rz(gate.qubit, neg(gate.θ))
 inv(gate::P) = P(gate.qubit, neg(gate.θ))
 inv(gate::CX) = gate
 inv(gate::CP) = CP(gate.control, gate.target, neg(gate.λ))
+inv(gate::Swap) = gate
 inv(gate::T) = Td(gate.qubit)
 inv(gate::S) = Sd(gate.qubit)
 inv(gate::Td) = T(gate.qubit)

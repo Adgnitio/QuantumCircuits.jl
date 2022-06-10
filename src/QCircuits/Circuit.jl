@@ -120,7 +120,7 @@ function QCircuit(qc::QCircuit)
 end
 
 ###################################################################################
-@cbooify QCircuit (x, sx, y, z, h, cx, s, sdg, t, tdg, u, u3, rx, ry, rz, p, cp, rzx, u4, barrier, measure, add!)
+@cbooify QCircuit (x, sx, y, z, h, cx, s, sdg, t, tdg, u, u3, rx, ry, rz, p, cp, swap, rzx, u4, barrier, measure, add!)
 
 "Add function macro"
 macro addfunction(name, gate)
@@ -145,6 +145,7 @@ end
 @addfunction(z, Z)
 @addfunction(h, H)
 @addfunction(cx, CX)
+@addfunction(swap, Swap)
 @addfunction(s, S)
 @addfunction(sdg, Sd)
 @addfunction(t, T)
@@ -560,6 +561,20 @@ function decompose(gate::CP)
         P(gate.target, gate.λ)
     ]
 end
+
+function decompose(gate::Swap)
+#           ┌───┐     
+# q_0: ──■──┤ X ├──■──
+#      ┌─┴─┐└─┬─┘┌─┴─┐
+# q_1: ┤ X ├──■──┤ X ├
+#      └───┘     └───┘ 
+    return [
+        CX(gate.control, gate.target),
+        CX(gate.target, gate.control),
+        CX(gate.control, gate.target)        
+    ]
+end
+
 
 function simplify(qc::QCircuit)
     newqc = QCircuit(qc)

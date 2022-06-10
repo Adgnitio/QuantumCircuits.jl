@@ -19,5 +19,6 @@ Filter = t -> !(typeof(t) === DataType && t in Set([
     QuantumCircuits.QCircuits.Gates.Sx,
     QuantumCircuits.QCircuits.Gates.Sxd,
     QuantumCircuits.QCircuits.Gates.CX,
+    QuantumCircuits.QCircuits.Gates.Swap,
     QuantumCircuits.QCircuits.Gates.CP,]))
 ```

@@ -17,7 +17,7 @@ using QuantumCircuits.QML
 
 using QuantumCircuits.QCircuits.Math
 using QuantumCircuits.QCircuits.Circuit: toQiskit
-using QuantumCircuits.QCircuits.Gates: Rx, Ry, Rz, X, Y, Z, S, Sd, T, Td, H, CX, U3, P, CP
+using QuantumCircuits.QCircuits.Gates: Rx, Ry, Rz, X, Y, Z, S, Sd, T, Td, H, CX, U3, P, CP, Swap
 
 import Zygote
 
@@ -195,3 +195,9 @@ for λ in λs
     test_unitary(2, [(X, [0]), (X, [1]), (CP, (1, 0, λ))], usedecompose=true)
 end
 
+################################################################################
+#  Swap                                                                          #
+################################################################################
+test_unitary(2, [(X, [0]), (X, [1]), (Swap, [0, 1])], usedecompose=true)
+test_unitary(2, [(Swap, [0, 1])], usedecompose=true)
+test_unitary(2, [(X, [0]), (Swap, [0, 1])], usedecompose=true)

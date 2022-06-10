@@ -102,9 +102,21 @@ using QuantumCircuits
 
 ###
 
-qc = QCircuit(3)
-qc.p(0, π)
-#qc.h(2)
+# qc = QCircuit(3)
+# qc.h(2)
+# qc.cp(1, 2, π/2)
+# qc.cp(0, 2, π/4)
+# qc.h(1)
+# qc.cp(0, 1, π/2)
+# qc.h(0)
+# qc.swap(0, 2)
+
+# decompose(qc)
+
+# qc = QCircuit(2)
+# qc.cx(0, 1)
+# qc.cx(1, 0)
+# qc.cx(0, 1)
 
 
 #qc.cp(pi/2, 1, 2)
