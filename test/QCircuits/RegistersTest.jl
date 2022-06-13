@@ -41,7 +41,7 @@ using QuantumCircuits.QCircuits.Gates
 
 qr = QuantumRegister(2, "q")
 cr = ClassicalRegister(2, "c")
-qc = QCircuit(qr, cr)
+qc = QCircuit(qr, cr, inline_optimization=false)
 add!(qc, X, qr[0])
 add!(qc, H, qr[1])
 add!(qc, Y, 0)
