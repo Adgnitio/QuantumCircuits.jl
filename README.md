@@ -1,3 +1,7 @@
+<p align="center">
+<img width="400px" src="docs/src/assets/QuantumCircuits.png"/>
+</p>
+
 Status: 
 [![CI](https://github.com/Adgnitio/QuantumCircuits.jl/actions/workflows/CI.yml/badge.svg)](https://github.com/Adgnitio/QuantumCircuits.jl/actions/workflows/CI.yml)
 [![codecov](https://codecov.io/gh/Adgnitio/QuantumCircuits.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Adgnitio/QuantumCircuits.jl)
