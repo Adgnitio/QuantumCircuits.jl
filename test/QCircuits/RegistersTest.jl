@@ -92,31 +92,19 @@ qc.y(qr)
 
 ###############################################################
 
-using QuantumCircuits
+# using QuantumCircuits
 
+# qr = QuantumRegister(3, "a")
 # num_a = QuantumNumber(3)
-# qc = QCircuit(num_a)
+# qc = QCircuit([qr, num_a])
+# qc.set(num_a, 3)
+
 
 # # Add 2 to register num_a
 # qc.add!(num_a, 2)
 
 ###
 
-# qc = QCircuit(3)
-# qc.h(2)
-# qc.cp(1, 2, π/2)
-# qc.cp(0, 2, π/4)
-# qc.h(1)
-# qc.cp(0, 1, π/2)
-# qc.h(0)
-# qc.swap(0, 2)
-
-# decompose(qc)
-
-# qc = QCircuit(2)
-# qc.cx(0, 1)
-# qc.cx(1, 0)
-# qc.cx(0, 1)
 
 
 #qc.cp(pi/2, 1, 2)

@@ -219,6 +219,7 @@ end
 function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Qubit, qubit2::Qubit)
     @assert qubit1 in qc.vqubits "Qubits is out of circuit qubits range."
     @assert qubit2 in qc.vqubits "Qubits is out of circuit qubits range."
+    @assert qubit1 != qubit2 "Qubits have to be different: $qubit1, $qubit2."
 
     add!(qc.dcg, gate(qubit1, qubit2))
     qc.has_code = false
@@ -227,6 +228,7 @@ end
 function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Integer, qubit2::Integer)
     @assert qubit1 < qc.qubits "Qubits $qubit1 is out of circuit qubits range $(qc.qubits)."
     @assert qubit2 < qc.qubits "Qubits $qubit2 is out of circuit qubits range $(qc.qubits)."
+    @assert qubit1 != qubit2 "Qubits have to be different: $qubit1, $qubit2."
 
     add!(qc, gate, qc.vqubits[qubit1 + 1], qc.vqubits[qubit2 + 1])
 
@@ -235,6 +237,7 @@ end
 function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Qubit, qubit2::Qubit, params)
     @assert qubit1 in qc.vqubits "Qubits is out of circuit qubits range."
     @assert qubit2 in qc.vqubits "Qubits is out of circuit qubits range."
+    @assert qubit1 != qubit2 "Qubits have to be different: $qubit1, $qubit2."
 
     if isnothing(params)
         add!(qc.dcg, gate(qubit1, qubit2))
@@ -247,6 +250,7 @@ end
 function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Integer, qubit2::Integer, params)
     @assert qubit1 < qc.qubits "Qubits $qubit1 is out of circuit qubits range $(qc.qubits)."
     @assert qubit2 < qc.qubits "Qubits $qubit2 is out of circuit qubits range $(qc.qubits)."
+    @assert qubit1 != qubit2 "Qubits have to be different: $qubit1, $qubit2."
 
     add!(qc, gate, qc.vqubits[qubit1 + 1], qc.vqubits[qubit2 + 1], params)
 

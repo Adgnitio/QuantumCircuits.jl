@@ -22,6 +22,7 @@ include("ComplexGates.jl")
 include("Graph.jl")
 include("Qiskit.jl")
 include("Circuit.jl")
+include("QLib.jl")
 
 # using QGen.Quantum.QBase
 #

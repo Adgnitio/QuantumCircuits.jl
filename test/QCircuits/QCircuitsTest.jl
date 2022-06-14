@@ -12,28 +12,43 @@
 
 println("Execute tests from: MathTest")
 include("MathTest.jl")
+
 println("Execute tests from: RegistersTest")
 include("RegistersTest.jl")
+
 println("Execute tests from: CircuitTest")
 include("CircuitTest.jl")
+
 println("Execute tests from: CircuitMacroTest")
 include("CircuitMacroTest.jl")
+
 println("Execute tests from: InstructionsTest")
 include("InstructionsTest.jl")
+
 println("Execute tests from: CircuitSimplifyTest")
 include("CircuitSimplifyTest.jl")
+
 println("Execute tests from: CircuitUnitaryTest")
 include("CircuitUnitaryTest.jl")
+
 println("Execute tests from: GatesTest")
 include("GatesTest.jl")
+
 println("Execute tests from: OtherGatesTest")
 include("OtherGatesTest.jl")
+
 println("Execute tests from: CircuitMeasureTest")
 include("CircuitMeasureTest.jl")
+
 println("Execute tests from: GraphTest")
 include("GraphTest.jl")
+
 println("Execute tests from: CircuitPythonTest")
 include("CircuitPythonTest.jl")
+
 println("Execute tests from: CircuitProbTest")
 include("CircuitProbTest.jl")
+
+println("Execute tests from: QLibTest")
+include("QLibTest.jl")
 

@@ -103,6 +103,8 @@ Base.show(io::IO, ::MIME{Symbol("text/plain")}, reg::Register) = show(io::IO, re
 # Quantum Register
 @register(QuantumRegister, Qubit, QuantumAbstractRegister)
 
+#@enum QuantumNumberState Empty Set
+
 # Quantum Register for store Numbers
 struct QuantumNumber <: QuantumAbstractRegister
     name::Union{String, Nothing}
