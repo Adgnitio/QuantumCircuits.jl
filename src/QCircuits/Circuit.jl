@@ -20,6 +20,7 @@ using QuantumCircuits.QCircuits.ComplexGates: U4_params
 using QuantumCircuits.QCircuits.OtherGates
 using QuantumCircuits.QCircuits.Instructions
 using QuantumCircuits.QCircuits.Registers
+import QuantumCircuits.QCircuits.Registers as Reg
 using QuantumCircuits.QCircuits.Qiskit
 using QuantumCircuits.QCircuits.Graph
 using QuantumCircuits.QCircuits.Math
@@ -120,7 +121,8 @@ function QCircuit(qc::QCircuit)
 end
 
 ###################################################################################
-@cbooify QCircuit (x, sx, y, z, h, cx, s, sdg, t, tdg, u, u3, rx, ry, rz, p, cp, swap, rzx, u4, barrier, measure, add!)
+@cbooify QCircuit (x, sx, y, z, h, cx, s, sdg, t, tdg, u, u3, rx, ry, rz, p, cp, swap, rzx,
+                   u4, barrier, measure, add!, set!)
 
 "Add function macro"
 macro addfunction(name, gate)
@@ -166,8 +168,26 @@ cp(qc::QCircuit, q1, q2, λ=ParameterT(rand()*2π)) = add!(qc, CP, q1, q2, λ)
 barrier(qc::QCircuit) = add!(qc, Barrier(qc.vqubits))
 measure(qc::QCircuit, q, c) = measure!(qc, q, c)
 
-function add!(qc::QCircuit, reg::QuantumNumber, num::Integer)
-    println("Test")
+
+function add!(qc::QCircuit, reg::QuantumInteger, num::Number)
+    println("Test add!")
+end
+
+
+function set!(qc::QCircuit, reg::QuantumInteger, num::Integer)
+    @assert reg.state == Reg.Empty "Unable to set used register."
+    @assert num < 2^reg.integer "The number $num is out of the register with $(reg.integer) qubits."
+
+    # Set the value
+    for (i, v) in enumerate(reverse(bitstring(num)))
+        if v == '1'
+            qc.x(reg[i-1])
+        end
+    end
+
+    # The number was set
+    reg.state = Reg.SettedNumber
+    nothing
 end
 
 ###################################################################################
@@ -312,6 +332,7 @@ function measure!(qc::QCircuit, qubit::Qubit, cbit::Cbit, setMatrix::Bool=true)
     if setMatrix
         setMeasureMatrix!(qc)
     end
+    nothing
 end
 
 "Add measures to circuit"
@@ -329,6 +350,7 @@ function measure!(qc::QCircuit, qubits::AbstractVector{<:Integer}, cbits::Abstra
     end
 
     setMeasureMatrix!(qc)
+    nothing
 end
 
 function setMeasureMatrix!(qc::QCircuit)

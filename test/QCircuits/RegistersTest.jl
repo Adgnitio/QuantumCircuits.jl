@@ -92,12 +92,26 @@ qc.y(qr)
 
 ###############################################################
 
-# using QuantumCircuits
+using QuantumCircuits
+using QuantumCircuits.Execute
 
-# qr = QuantumRegister(3, "a")
-# num_a = QuantumNumber(3)
-# qc = QCircuit([qr, num_a])
-# qc.set(num_a, 3)
+qr = QuantumRegister(3, "a")
+cr = ClassicalRegister(3)
+num_a = QuantumInteger(3)
+cr_a = ClassicalRegister(num_a)
+num_b = QuantumInteger(3)
+cr_b = ClassicalRegister(num_b)
+qc = QCircuit([qr, num_a, num_b], [cr, cr_a, cr_b])
+qc.set!(num_a, 3)
+qc.set!(num_b, 4)
+#qc.x(qr)
+qc.h(qr)
+qc.measure(num_a, cr_a)
+qc.measure(num_b, cr_b)
+qc.measure(qr, cr)
+
+ret = execute(qc)
+
 
 
 # # Add 2 to register num_a
@@ -105,6 +119,6 @@ qc.y(qr)
 
 ###
 
-
+#num_a.state
 
 #qc.cp(pi/2, 1, 2)

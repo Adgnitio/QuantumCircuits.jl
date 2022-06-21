@@ -24,8 +24,8 @@ include("Qiskit.jl")
 include("Circuit.jl")
 include("QLib.jl")
 
-# using QGen.Quantum.QBase
-#
-# export QuantumCircuit, QuantumDevice, QuantumGate, add!
+using QuantumCircuits.QCircuits.Circuit
+
+export QCircuit
 
 end # module
