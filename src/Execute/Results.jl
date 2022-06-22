@@ -13,6 +13,8 @@
 module Results
 
 using QuantumCircuits.QCircuits
+using QuantumCircuits.QCircuits.Circuit
+using QuantumCircuits.QCircuits.Registers
 using QuantumCircuits.Execute.Devices
 
 export Result, ResultsSet
@@ -27,6 +29,7 @@ end
 "The results set."
 struct ResultsSet <: AbstractDict{String, Result}
     results::Dict{String, Result}
+    mapping::Vector{Int64}
     circuit::QCircuit
 end
 
@@ -43,25 +46,53 @@ Base.show(io::IO, ::MIME{Symbol("text/plain")}, rs::ResultsSet) = show(io::IO, r
 function getresults(qc::QCircuit, params=nothing)
     ret = execute(qc::QCircuit, params)
 
+    N = qc.qubits
+    M = length(qc.measures)
+    if M > 0
+        mapping = zeros(Int64, M)
+        q2c = zeros(Int64, M)
+        for (q, c) in qc.measures
+            mapping[getid(c)+1] = getid(q) + 1
+            q2c[M - getid(q)] = N - getid(c)
+        end
+    else
+        q2c = [i for i in 1:N]
+        mapping = [i for i in 1:N]
+    end
+
     results = Dict{String, Result}()
     for (i, v) in enumerate(ret)
-        if v > 0
+        if v > 0            
             bs = bitstring(i-1)[end-qc.qubits+1:end]
+            bs = String([bs[i] for i in q2c])
             push!(results, bs => Result(bs, v))
         end
     end
 
-    return ResultsSet(results, qc)
+    return ResultsSet(results, mapping, qc)    
 end
 
 function Base.get(rs::ResultsSet, key::String, _)
     return rs.results[key]
 end
 
-# function Base.get(rs::ResultsSet, qr::QuantumRegister, _)
+function Base.get(rs::ResultsSet, qr::QuantumRegister, _)
+    @assert ismeasured(rs.circuit, qr) "The register has to be measured."
 
-#     return rs.results[key]
-# end
+    results = Dict{String, Float64}()
+    for (k, v) in rs.results
+        bs = String([k[rs.mapping[getid(i)+1]] for i in qr.bits])
+        p = get(results, bs, 0)
+        results[bs] = p + v.p
+    end
+
+    res= Dict{String, Result}()
+    for (bs, p) in results
+        push!(res, bs => Result(bs, p))
+    end
+
+    return res
+end
 
 
 end  # module Results

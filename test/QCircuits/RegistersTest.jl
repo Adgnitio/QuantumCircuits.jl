@@ -13,6 +13,7 @@
 using Test
 
 using QuantumCircuits
+using QuantumCircuits.Circuit
 
 ###############################################################
 qra = QuantumRegister(2, "a")
@@ -35,6 +36,16 @@ c: 4/═══════════════
                     "
 
 @test ex == string(qc)
+
+@test !ismeasured(qc, qra)
+@test !ismeasured(qc, qrb)
+qc.measure(qra, cr[0:1])
+@test ismeasured(qc, qra)
+@test !ismeasured(qc, qrb)
+qc.measure(qrb, cr[2:3])
+@test ismeasured(qc, qra)
+@test ismeasured(qc, qrb)
+
 ###############################################################
 
 using QuantumCircuits.QCircuits.Gates

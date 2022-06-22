@@ -36,7 +36,7 @@ import QuantumCircuits.QCircuits.QBase: add!, tomatrix, setparameters!, simplify
        standardGateError, decompose, measure!, bindparameters!
 import Base.show
 
-export QCircuit, getparameters, getRandParameters, toString, setClassicalRegister!, toPythonQiskitCode
+export QCircuit, getparameters, getRandParameters, toString, setClassicalRegister!, toPythonQiskitCode, ismeasured
 
 "Nothing function"
 const nop = () -> nothing
@@ -373,6 +373,15 @@ function setMeasureMatrix!(qc::QCircuit)
     qc.measures_matrix = mes_matrix
 end
 
+function ismeasured(qc, reg)
+    @assert reg in qc.qRegisters "Regiester has to be in circuits."
+
+    # measured qubits
+    mes_qubits = Set([getid(k[1]) for k in qc.measures])
+
+    # check if all qubits were measured
+    return all(getid(b) in mes_qubits for b in reg.bits)
+end
 
 ###################################################################################
 
