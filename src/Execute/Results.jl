@@ -17,18 +17,11 @@ using QuantumCircuits.QCircuits.Circuit
 using QuantumCircuits.QCircuits.Registers
 using QuantumCircuits.Execute.Devices
 
-export Result, ResultsSet
-
-"The result row."
-struct Result
-    bits::String
-    p::Float64
-end
-
+export ResultsSet
 
 "The results set."
-struct ResultsSet <: AbstractDict{String, Result}
-    results::Dict{String, Result}
+struct ResultsSet <: AbstractDict{String, Float64}
+    results::Dict{String, Float64}
     mapping::Vector{Int64}
     circuit::QCircuit
 end
@@ -38,7 +31,6 @@ Base.iterate(rs::ResultsSet) = Base.iterate(rs.results)
 Base.iterate(rs::ResultsSet, state) = Base.iterate(rs.results, state)
 
 "Show methods"
-Base.show(io::IO, r::Result) = show(io::IO, r.bits)
 Base.show(io::IO, rs::ResultsSet) = show(io::IO, rs.results)
 Base.show(io::IO, ::MIME{Symbol("text/plain")}, rs::ResultsSet) = show(io::IO, rs.results)
 
@@ -49,50 +41,83 @@ function getresults(qc::QCircuit, params=nothing)
     N = qc.qubits
     M = length(qc.measures)
     if M > 0
-        mapping = zeros(Int64, M)
-        q2c = zeros(Int64, M)
-        for (q, c) in qc.measures
-            mapping[getid(c)+1] = getid(q) + 1
-            q2c[M - getid(q)] = N - getid(c)
+        mapping = zeros(Int64, N)
+        q2c = zeros(Int64, N)        
+        for (q, c) in qc.measures        
+            q2c[getid(c) + 1] = getid(q) + 1
+            mapping[getid(q) + 1] = getid(c) + 1
         end
     else
         q2c = [i for i in 1:N]
-        mapping = [i for i in 1:N]
+        mapping = [i for i in 1:M]
     end
+    # remove all zeros
+    deleteat!(q2c, findall(x->x==0, q2c))
 
-    results = Dict{String, Result}()
+    measured_qubits = Set([getid(q) + 1 for (q, c) in qc.measures])
+    results = Dict{String, Float64}()
+    # if there is no measurmend, we measure all
+    if M == 0
+        nM = N
+    else
+        nM = M
+    end
     for (i, v) in enumerate(ret)
-        if v > 0            
-            bs = bitstring(i-1)[end-qc.qubits+1:end]
-            bs = String([bs[i] for i in q2c])
-            push!(results, bs => Result(bs, v))
+        if v > 0                        
+            bs = reverse(bitstring(i-1)[end-nM+1:end])
+            if N > M && M != 0
+                next = 1
+                nbs = ""
+                for j in 1:N                    
+                    if j in measured_qubits
+                        nbs = nbs * bs[next]
+                        next += 1
+                    else
+                        nbs = nbs * "X"
+                    end
+                end
+                bs = nbs
+            end
+
+            bs = reverse(String([bs[i] for i in q2c]))
+            push!(results, bs => v)
         end
     end
 
-    return ResultsSet(results, mapping, qc)    
+    return ResultsSet(results, mapping, qc)  
 end
 
 function Base.get(rs::ResultsSet, key::String, _)
     return rs.results[key]
 end
 
-function Base.get(rs::ResultsSet, qr::QuantumRegister, _)
+
+
+
+function innerget(rs::ResultsSet, qr::QuantumAbstractRegister)
     @assert ismeasured(rs.circuit, qr) "The register has to be measured."
 
     results = Dict{String, Float64}()
     for (k, v) in rs.results
-        bs = String([k[rs.mapping[getid(i)+1]] for i in qr.bits])
+        bs = reverse(String([reverse(k)[rs.mapping[getid(i)+1]] for i in qr.bits]))
         p = get(results, bs, 0)
-        results[bs] = p + v.p
+        results[bs] = p + v
     end
 
-    res= Dict{String, Result}()
-    for (bs, p) in results
-        push!(res, bs => Result(bs, p))
+    return results
+end
+
+Base.get(rs::ResultsSet, qr::QuantumRegister, _) = innerget(rs, qr)
+
+function Base.get(rs::ResultsSet, qr::QuantumInteger, _)    
+    results = innerget(rs, qr)
+
+    res = Dict{Int64, Float64}()
+    for (k, p) in results
+        push!(res, parse(Int64, k; base=2) => p)
     end
 
     return res
 end
-
 
 end  # module Results

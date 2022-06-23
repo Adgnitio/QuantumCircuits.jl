@@ -111,7 +111,7 @@ end
 QCircuit(n::Integer; inline_optimization=true) = QCircuit([QuantumRegister(n)], [ClassicalRegister(n)], inline_optimization=inline_optimization)
 QCircuit(qReg::QuantumAbstractRegister, cReg::ClassicalRegister; inline_optimization=true) = QCircuit([qReg], [cReg], inline_optimization=inline_optimization)
 QCircuit(reg::QuantumAbstractRegister; inline_optimization=true) = QCircuit([reg], ClassicalRegister[], inline_optimization=inline_optimization)
-QCircuit(regs::Vector{<:QuantumAbstractRegister}; inline_optimization=true) = QCircuit(regs, [ClassicalRegister(sum([length(i) for i in regs]))], inline_optimization=inline_optimization)
+QCircuit(regs::Vector{<:QuantumAbstractRegister}; inline_optimization=true) = QCircuit(regs, [ClassicalRegister(sum([(i.tomeasure ? length(i) : 0) for i in regs]))], inline_optimization=inline_optimization)
 QCircuit(regs::Vector{<:QuantumAbstractRegister}, cReg::ClassicalRegister; inline_optimization=true) = QCircuit(regs, [cReg], inline_optimization=inline_optimization)
 function QCircuit(qc::QCircuit)
     qregs = [QuantumRegister(length(r), r.name) for r in qc.qRegisters]
@@ -167,7 +167,7 @@ cp(qc::QCircuit, q1, q2, λ=ParameterT(rand()*2π)) = add!(qc, CP, q1, q2, λ)
 
 barrier(qc::QCircuit) = add!(qc, Barrier(qc.vqubits))
 measure(qc::QCircuit, q, c) = measure!(qc, q, c)
-
+measure(qc::QCircuit) = measure!(qc)
 
 function add!(qc::QCircuit, reg::QuantumInteger, num::Number)
     println("Test add!")
@@ -352,6 +352,22 @@ function measure!(qc::QCircuit, qubits::AbstractVector{<:Integer}, cbits::Abstra
     setMeasureMatrix!(qc)
     nothing
 end
+
+"Add measures to circuit"
+function measure!(qc::QCircuit)
+    @assert length(qc.cRegisters) == 1 "Something go wrong."
+    cr = qc.cRegisters[1]
+
+    i = 0
+    for r in qc.qRegisters
+        if r.tomeasure
+            l = length(r)
+            qc.measure(r, cr[i:i+l-1])
+            i = i + l
+        end
+    end
+end
+
 
 function setMeasureMatrix!(qc::QCircuit)
     measured = [(i-1, v) for (i, v) in enumerate(sort!([getid(q)  for (q, c) in qc.measures]))]

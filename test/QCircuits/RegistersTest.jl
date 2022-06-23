@@ -106,23 +106,26 @@ qc.y(qr)
 using QuantumCircuits
 using QuantumCircuits.Execute
 
-qr = QuantumRegister(3, "a")
-cr = ClassicalRegister(3)
-num_a = QuantumInteger(3)
-cr_a = ClassicalRegister(num_a)
-num_b = QuantumInteger(3)
-cr_b = ClassicalRegister(num_b)
-qc = QCircuit([qr, num_a, num_b], [cr, cr_a, cr_b])
-qc.set!(num_a, 3)
-qc.set!(num_b, 4)
-#qc.x(qr)
-qc.h(qr)
-qc.measure(num_a, cr_a)
-qc.measure(num_b, cr_b)
-qc.measure(qr, cr)
+for i in 0:2^3-1   
+     for j in 0:2^3-1
+          nqr = QuantumRegister(3, "a", tomeasure=false)
+          num_a = QuantumInteger(3)
+          num_b = QuantumInteger(3)
+          nqc = QCircuit([nqr, num_a, num_b])
+          nqc.set!(num_a, i)
+          nqc.set!(num_b, j)
+          nqc.h(qr)
+          nqc.measure()
 
-ret = execute(qc)
+          rs = getresults(nqc)
+          @test abs(rs[num_a][i] - 1.0) < 1e-8
+          @test abs(rs[num_b][j] - 1.0) < 1e-8
+     end
+end
 
+
+
+qc.measures
 
 
 # # Add 2 to register num_a

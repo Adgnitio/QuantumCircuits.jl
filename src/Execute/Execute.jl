@@ -18,8 +18,10 @@ include("Results.jl")
 using QuantumCircuits.Execute.Devices: execute, QuantumSimulator, QiskitQuantum, @ket_str, @bra_str,
        loss_expected_zero_state, qderivative, qexecute
 
+using QuantumCircuits.Execute.Results: getresults
+
 
 export execute, QuantumSimulator, QiskitQuantum, @ket_str, @bra_str,
-       loss_expected_zero_state, qderivative, qexecute
+       loss_expected_zero_state, qderivative, qexecute, getresults
 
 end  # module Execute

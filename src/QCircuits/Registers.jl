@@ -83,10 +83,11 @@ macro register(name, bit, basetype)
         struct $name <: $basetype
             name::Union{String, Nothing}
             bits::Vector{$bit}
+            tomeasure::Bool
 
-            $name(n::Integer, name::Union{String, Nothing}) = new(name, [$bit(i) for i in 0:(n-1)])
+            $name(n::Integer, name::Union{String, Nothing}; tomeasure::Bool=true) = new(name, [$bit(i) for i in 0:(n-1)], tomeasure)
         end
-        $name(n::Integer) = $name(n, nothing)
+        $name(n::Integer; tomeasure::Bool=true) = $name(n, nothing, tomeasure=tomeasure)
         function Base.show(io::IO, reg::$name)
             if isnothing(reg.name)
                 Base.show(io, string($name) * "($(length(reg)))")
@@ -116,14 +117,16 @@ mutable struct QuantumInteger <: QuantumNumber
     integer::Integer # integer part precision
     bits::Vector{Qubit}
     state::QuantumNumberState
+    tomeasure::Bool
 
-    QuantumInteger(integer::Integer, name::Union{String, Nothing}) = 
+    QuantumInteger(integer::Integer, name::Union{String, Nothing}; tomeasure::Bool=true) = 
         new(name,
             integer,
             [Qubit(i) for i in 0:(integer  - 1)],
-            Empty)
+            Empty,
+            tomeasure)
 end
-QuantumInteger(integer::Integer) = QuantumInteger(integer, nothing)
+QuantumInteger(integer::Integer; tomeasure::Bool=true) = QuantumInteger(integer, nothing, tomeasure=tomeasure)
 function Base.show(io::IO, reg::QuantumInteger)
     if isnothing(reg.name)
         Base.show(io, "QuantumInteger($(reg.integer))")
@@ -143,15 +146,16 @@ mutable struct QuantumFloat <: QuantumNumber
     fractional::Integer # fractional part precision
     bits::Vector{Qubit}
     state::QuantumNumberState
+    tomeasure::Bool
 
-    QuantumFloat(integer::Integer, fractional::Integer, name::Union{String, Nothing}) = 
+    QuantumFloat(integer::Integer, fractional::Integer, name::Union{String, Nothing}; tomeasure::Bool=true) = 
         new(name,
             integer,
             fractional,
-            [Qubit(i) for i in 0:(integer + fractional - 1)], Empty)
+            [Qubit(i) for i in 0:(integer + fractional - 1)], Empty, tomeasure)
 end
-QuantumFloat(integer::Integer, fractional::Integer) = QuantumFloat(integer, fractional, nothing)
-QuantumFloat(integer::Integer) = QuantumFloat(integer, 0, nothing)
+QuantumFloat(integer::Integer, fractional::Integer; tomeasure::Bool=true) = QuantumFloat(integer, fractional, nothing, tomeasure=tomeasure)
+QuantumFloat(integer::Integer; tomeasure::Bool=true) = QuantumFloat(integer, 0, nothing, tomeasure=tomeasure)
 function Base.show(io::IO, reg::QuantumFloat)
     if isnothing(reg.name)
         Base.show(io, "QuantumNumber($(reg.integer), $(reg.fractional))")
