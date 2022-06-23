@@ -114,7 +114,7 @@ for i in 0:2^3-1
           nqc = QCircuit([nqr, num_a, num_b])
           nqc.set!(num_a, i)
           nqc.set!(num_b, j)
-          nqc.h(qr)
+          nqc.h(nqr)
           nqc.measure()
 
           rs = getresults(nqc)
@@ -124,8 +124,22 @@ for i in 0:2^3-1
 end
 
 
+for n in 0:2^4-1  
+     nqr = QuantumRegister(3, "a", tomeasure=false)
+     num_a = QuantumFloat(2, 2)
+     num_b = QuantumFloat(2, 2)
+     nqc = QCircuit([num_a, nqr, num_b])
+     i = n/4.0
+     j = 3.75
+     nqc.set!(num_a, i)
+     nqc.set!(num_b, j)
+     nqc.h(nqr)
+     nqc.measure()
 
-qc.measures
+     rs = getresults(nqc)
+     @test abs(rs[num_a][i] - 1.0) < 1e-8
+     @test abs(rs[num_b][j] - 1.0) < 1e-8
+end
 
 
 # # Add 2 to register num_a

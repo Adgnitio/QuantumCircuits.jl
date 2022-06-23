@@ -91,9 +91,6 @@ function Base.get(rs::ResultsSet, key::String, _)
     return rs.results[key]
 end
 
-
-
-
 function innerget(rs::ResultsSet, qr::QuantumAbstractRegister)
     @assert ismeasured(rs.circuit, qr) "The register has to be measured."
 
@@ -119,5 +116,17 @@ function Base.get(rs::ResultsSet, qr::QuantumInteger, _)
 
     return res
 end
+
+function Base.get(rs::ResultsSet, qr::QuantumFloat, _)    
+    results = innerget(rs, qr)
+
+    res = Dict{Float64, Float64}()
+    for (k, p) in results
+        push!(res, parse(Int64, k; base=2) / 2^qr.fractional => p)
+    end
+
+    return res
+end
+
 
 end  # module Results
