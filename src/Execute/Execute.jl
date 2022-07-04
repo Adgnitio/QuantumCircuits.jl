@@ -23,6 +23,7 @@ using QuantumCircuits.QCircuits.Qiskit
 using QuantumCircuits.QCircuits.Qiskit: qiskit
 using QuantumCircuits.QCircuits.Gates: ParamT
 using QuantumCircuits.QCircuits.Registers
+using Dates
 
 export execute, QuantumSimulator, QiskitQuantum, @ket_str, @bra_str,
        loss_expected_zero_state, qderivative, qexecute
@@ -103,11 +104,15 @@ function extractProbability(counts::Dict, qubits::Integer, shots::Integer)
 end
 
 function execute(device::QiskitQuantum, qc::QiskitCircuit; shots=8192, debug=true)
+    start_date = now()
     job = qiskit.execute(qc.qc, device.backend, shots=shots)
     debug && println("Job ID: $(job.job_id()) run single circuit.")
     #debug && qiskit.tools.monitor.job_monitor(job)
-
+    
     res = job.result().get_counts()
+    end_date = now()
+    time_difference = Dates.DateTime(end_date) - Dates.DateTime(start_date)
+    debug && println("Job $(job.job_id()) took $time_difference.")
 
     return extractProbability(res, length(qc.cbits), shots)
 end
@@ -122,6 +127,7 @@ function execute(device::QuantumSimulator, circuits::Vector{QCircuit})
 end
 
 function execute(device::QiskitQuantum, circuits::Vector{QiskitCircuit}; shots=8192, debug=true)
+    start_date = now()
     jobs = [qc.qc for qc in circuits]
     job = qiskit.execute(jobs, device.backend, shots=shots)
     debug && println("Job ID: $(job.job_id()) run $(length(jobs)) circuits.")
@@ -129,6 +135,11 @@ function execute(device::QiskitQuantum, circuits::Vector{QiskitCircuit}; shots=8
 
     # Get results
     job_results = job.result().get_counts()
+
+    # Log execution time
+    end_date = now()
+    time_difference = Dates.DateTime(end_date) - Dates.DateTime(start_date)
+    debug && println("Job $(job.job_id()) took $time_difference.")
 
     results = Vector{Float64}[]
     for (res, qc) in zip(job_results, circuits)
@@ -270,8 +281,8 @@ function qjacobian(backend, qc, params::Vector{<:ParamT}, runN=1, corrMes=true)
 end
 
 "Caclulate loss value and it derivateive"
-function qderivative(backend, qc, loss, params::Vector{<:ParamT}, runN=1)
-    y, jak = qjacobian(backend, qc, params, runN)
+function qderivative(backend, qc, loss, params::Vector{<:ParamT}, runN=1; corrMes=true)
+    y, jak = qjacobian(backend, qc, params, runN, corrMes)
     der = transpose(jak) * loss'(y)
     return loss(y), der
 end

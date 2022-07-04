@@ -66,13 +66,15 @@ params = getRandParameters(qc)
 setparameters!(qc, params)
 
 
+mse_error_loss(state_end) = sum((diss_p - state_end).^2)^0.5
+
 function loss(params)
     start = ket"000000000"
     mat = tomatrix(qc, params)
     state_end = state2probability(mat * start)
     
     # mse error
-    return sum((diss_p - state_end).^2)^0.5 
+    return mse_error_loss(state_end)
 end
 
 
@@ -81,13 +83,35 @@ loss(params)
 # check if derivative of loss function works
 loss'(params)
 
+# copy start params
+start_params = params[:]
 # run the optimization to find the best parameters
 @time val, x, itr = gradientDescent(loss, loss', params, α=0.1, maxItr=30,
                               useBigValInc=true, argsArePeriodic=true)
 
 loss(params)   
-
-
 # loss start params -> 0.16722889593223778
 # loss at the end, after 30 itr -> 0.025258502809051248
 # 30 itrerations take 51.608174 seconds
+
+
+
+#############################################################################
+#                  Compare with Qiskit                                      #
+#############################################################################
+using QuantumCircuits.QCircuits.Qiskit
+using QuantumCircuits.QCircuits.Qiskit: qiskit
+
+const qiskitBackendSim = QiskitQuantum()
+
+# number of parameters
+length(params) # 99
+# time of julia derivatives
+@time loss'(params)
+# 1.446867 seconds (61.62 k allocations: 1.857 GiB, 13.19% gc time)
+
+@time qderivative(qiskitBackendSim, qc, mse_error_loss, params, corrMes=false)
+# Job ID: 2374456f-ddda-4d4a-a8de-5f29a55d998c run 199 circuits.
+# Job Status: job has successfully run
+# Job 2374456f-ddda-4d4a-a8de-5f29a55d998c took 7 562 milliseconds.
+
