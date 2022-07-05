@@ -1,10 +1,11 @@
 name = "QuantumCircuits"
 uuid = "ad924a34-1f3f-4025-ae82-e16b6f8ddf61"
 authors = ["Rafał Pracht <rpracht@wp.pl>"]
-version = "0.1.0"
+version = "0.1.1"
 
 [deps]
 CBOOCall = "b012eb62-94f7-4100-b683-fca14a09dfae"
+Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
 Distributions = "31c24e10-a181-5473-b8eb-7969acd0382f"
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 MacroTools = "1914dd2f-81c6-5fcd-8719-6d5c9610ff09"
