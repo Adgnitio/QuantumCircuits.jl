@@ -13,43 +13,37 @@
 module QLib
 
 using QuantumCircuits.QCircuits.QBase
+using QuantumCircuits.QCircuits.Registers
 using QuantumCircuits.QCircuits.Circuit
+using QuantumCircuits.QCircuits.Gates: H, CP
+
 
 "Performs qft on the first n qubits in circuit (without swaps)."
-function qft_rotations!(circuit::QCircuit, n::Integer)
+function qft_rotations!(qc::Union{QCircuit, QuantumRegister}, code::Vector{T}, n::Integer; inverse=false) where T <: QuantumGate
     # Break the recurence
     n == 0 && return nothing
 
     n -= 1
-    circuit.h(n)
+    #circuit.h(n)
+    push!(code, H(qc[n]))
     for qubit in 0:(n-1)
-        circuit.cp(qubit, n, π/2^(n-qubit))
+        #circuit.cp(qubit, n, π/2^(n-qubit))
+        push!(code, CP(qc[qubit], qc[n], π/2^(n-qubit)))
     end
 
     # At the end of our function, we call the same function again on
     # the next qubits (we reduced n by one earlier in the function)
-    qft_rotations!(circuit, n)
+    qft_rotations!(qc, code, n)
+
+    if inverse
+        return reverse!(code)
+    else
+        return code
+    end
 end
-
-# "Performs inverse qft on the first n qubits in circuit (without swaps)."
-# function inv_qft_rotations!(circuit::QCircuit, n::Integer)
-#     # Break the recurence
-#     n == 0 && return nothing
-
-#     n -= 1
-#     circuit.h(n)
-#     for qubit in 0:(n-1)
-#         circuit.cp(qubit, n, π/2^(n-qubit))
-#     end
-
-#     # At the end of our function, we call the same function again on
-#     # the next qubits (we reduced n by one earlier in the function)
-#     qft_rotations!(circuit, n)
-# end
 
 function swap_registers!(circuit::QCircuit, n::Integer)
     for qubit in 0:Int(floor(n / 2))-1
-        @show qubit, n-qubit-1
         circuit.swap(qubit, n-qubit-1)
     end
 
@@ -57,25 +51,16 @@ function swap_registers!(circuit::QCircuit, n::Integer)
 end
 
 "QFT on the first n qubits in circuit"
-function qft!(circuit::QCircuit, n::Integer; doswap=true)
-    qft_rotations!(circuit, n)
-    doswap && swap_registers!(circuit, n)
+function qft!(circuit::QCircuit; doswap=true, inverse=false)
+    doswap && inverse && swap_registers!(circuit, circuit.qubits)
+
+    code = QuantumGate[]
+    qft_rotations!(circuit, code, circuit.qubits, inverse=inverse)
+    circuit.add!(code)
+
+    doswap && !inverse && swap_registers!(circuit, circuit.qubits)
     
     return nothing
 end 
-
-# "Does the inverse QFT on the first n qubits in circuit"
-# function inverse_qft!(circuit::QCircuit, n::Integer; doswap=true)
-#     # First we create a QFT circuit of the correct size:
-#     qft_circ = qft(QCircuit(n), n)
-
-#     # Then we take the inverse of this circuit
-#     invqft_circ = qft_circ.inverse()
-#     # And add it to the first n qubits in our existing circuit
-#     circuit.append(invqft_circ, circuit.qubits[:n])
-#     #return circuit.decompose() # .decompose() allows us to see the individual gates
-
-#     return nothing
-# end 
 
 end  # module QLib

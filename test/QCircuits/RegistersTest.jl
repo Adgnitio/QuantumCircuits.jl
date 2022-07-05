@@ -102,7 +102,8 @@ qc.y(qr)
 
 
 ###############################################################
-
+#                  Set                                        #
+###############################################################
 using QuantumCircuits
 using QuantumCircuits.Execute
 
@@ -142,7 +143,28 @@ for n in 0:2^4-1
 end
 
 
+###############################################################
+#                  Add                                        #
+###############################################################
 # # Add 2 to register num_a
+
+# num_a = QuantumInteger(3)
+# nqc = QCircuit([num_a])
+# nqc.set!(num_a, 3)
+
+
+# #nqc.add!(num_a, 2)
+# nqc.measure()
+
+
+# rs = getresults(nqc)
+# rs[num_a]
+
+
+# @test abs(rs[num_a][i] - 1.0) < 1e-8
+# @test abs(rs[num_b][j] - 1.0) < 1e-8
+
+
 # qc.add!(num_a, 2)
 
 ###

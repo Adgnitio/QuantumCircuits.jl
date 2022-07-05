@@ -121,6 +121,13 @@ function QCircuit(qc::QCircuit)
 end
 
 ###################################################################################
+function Base.getindex(qc::QCircuit, idx::Int)
+    @assert idx >=0 && idx < qc.qubits "The $idx is out of bound for $(qc.qubits) circuits."
+
+    return qc.vqubits[idx + 1]
+end
+
+###################################################################################
 @cbooify QCircuit (x, sx, y, z, h, cx, s, sdg, t, tdg, u, u3, rx, ry, rz, p, cp, swap, rzx,
                    u4, barrier, measure, add!, set!)
 

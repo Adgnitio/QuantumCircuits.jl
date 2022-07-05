@@ -722,7 +722,7 @@ getqubitsids(gate::TwoQubitsGate) = (getid(gate.control), getid(gate.target))
 
 "Show method"
 Base.show(io::IO, gate::QuantumGate) = print(io, "$(typeof(gate))($(gate.qubit))")
-Base.show(io::IO, gate::CX) = print(io, "CX($(gate.control), $(gate.target))")
+Base.show(io::IO, gate::TwoQubitsGate) = print(io, "$(typeof(gate))($(gate.control), $(gate.target))")
 
 
 
