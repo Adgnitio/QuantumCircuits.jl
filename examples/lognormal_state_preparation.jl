@@ -14,7 +14,7 @@ using QuantumCircuits
 using QuantumCircuits.QML
 using QuantumCircuits.QML.Optimization
 using QuantumCircuits.Execute
-using QuantumCircuits.Execute: state2probability
+using QuantumCircuits.Execute.Devices: state2probability
 using QuantumCircuits.QCircuits.Circuit
 
 using Distributions: LogNormal, quantile, cdf, pdf

@@ -14,7 +14,7 @@ using QuantumCircuits
 using QuantumCircuits.QML
 using QuantumCircuits.QML.Optimization
 using QuantumCircuits.Execute
-using QuantumCircuits.Execute: state2probability
+using QuantumCircuits.Execute.Devices: state2probability
 using QuantumCircuits.QCircuits.Circuit
 
 using Distributions: LogNormal, quantile, cdf, pdf
@@ -108,10 +108,12 @@ const qiskitBackendSim = QiskitQuantum()
 length(params) # 99
 # time of julia derivatives
 @time loss'(params)
-# 1.446867 seconds (61.62 k allocations: 1.857 GiB, 13.19% gc time)
+# 1.371532 seconds (61.62 k allocations: 1.857 GiB, 6.16% gc time)
 
 @time qderivative(qiskitBackendSim, qc, mse_error_loss, params, corrMes=false)
 # Job ID: 2374456f-ddda-4d4a-a8de-5f29a55d998c run 199 circuits.
 # Job Status: job has successfully run
-# Job 2374456f-ddda-4d4a-a8de-5f29a55d998c took 7 562 milliseconds.
+# Job 2374456f-ddda-4d4a-a8de-5f29a55d998c took 8 078 milliseconds.
 
+8.078 / 1.371532
+# 5.889764146953917 times faster
