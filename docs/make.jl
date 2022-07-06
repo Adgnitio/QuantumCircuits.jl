@@ -44,6 +44,7 @@ makedocs(
                 "Instructions" => "QCircuits/Instructions.md",
                 "Math" => "QCircuits/Math.md",
                 "QBase" => "QCircuits/QBase.md",  
+                "QLib" => "QCircuits/QLib.md",  
             ],
             "Execute" => "Execute.md",
             "QML" => [
