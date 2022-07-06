@@ -21,7 +21,7 @@ export Bit, Qubit, Cbit, Register, ClassicalRegister, QuantumRegister,
 abstract type Bit end
 
 "The abstract register"
-abstract type Register <: AbstractVector{Int} end
+abstract type Register <: AbstractVector{Bit} end
 
 "The quantum abstract register"
 abstract type QuantumAbstractRegister <: Register end
@@ -180,7 +180,8 @@ Base.checkbounds(reg::Register, I...) = length(I) == 1 && all(i >= 0 && i < leng
 function Base.getindex(reg::Register, idx::Integer)
     @assert idx < length(reg) "The index $idx is out of bound for register $(reg.name) with length $(length(reg))."
 
-    return getid(reg.bits[idx + 1])
+    #return getid(reg.bits[idx + 1])
+    return reg.bits[idx + 1]
 end
 
 

@@ -91,54 +91,61 @@ qft!(qc, inverse=true)
 ################################################################################
 #  qft - registers                                                                       #
 ################################################################################
-# expqr1 = QuantumRegister(3)
-# expqr2 = QuantumRegister(3)
-# expqc = QCircuit([expqr1, expqr2])
-# expqc.h(expqr1[2])
-# expqc.cp(expqr1[0], expqr1[2], π/4)
-# expqc.cp(expqr1[1], expqr1[2], π/2)
-# expqc.h(expqr1[1])
-# expqc.cp(expqr1[0], expqr1[1], π/2)
-# expqc.h(expqr1[0])
+expqr1 = QuantumRegister(3)
+expqr2 = QuantumRegister(3)
+expqc = QCircuit([expqr1, expqr2])
+expqc.h(expqr1[2])
+expqc.cp(expqr1[0], expqr1[2], π/4)
+expqc.cp(expqr1[1], expqr1[2], π/2)
+expqc.h(expqr1[1])
+expqc.cp(expqr1[0], expqr1[1], π/2)
+expqc.h(expqr1[0])
 
 
-# qr1 = QuantumRegister(3)
-# qr2 = QuantumRegister(3)
-# qc = QCircuit([qr1, qr2])
-# code = QuantumGate[]
-# qft_rotations!(qr1, code, length(qr1))
-# qc.add!(code)
-# @test qc == expqc
+qr1 = QuantumRegister(3)
+qr2 = QuantumRegister(3)
+qc = QCircuit([qr1, qr2])
+code = QuantumGate[]
+qft_rotations!(qr1, code, length(qr1))
+qc.add!(code)
+@test qc == expqc
 
-# typeof(qc[1])
-# typeof(qr1[1])
 
-# #####
-# qr1 = QuantumRegister(3)
-# qr2 = QuantumRegister(3)
-# qc = QCircuit([qr1, qr2])
-# qft!(qr1, doswap=false)
-# @test qc == expqc
+#####
+qr1 = QuantumRegister(3)
+qr2 = QuantumRegister(3)
+qc = QCircuit([qr1, qr2])
+qft!(qc, qr1, doswap=false)
+@test qc == expqc
 
-# ## with swap
-# expqc.swap(0, 2)
+## with swap
+expqc.swap(qr1[0], qr1[2])
 
-# qc = QCircuit(3)
-# qft!(qc)
-# @test qc == expqc
+qr1 = QuantumRegister(3)
+qr2 = QuantumRegister(3)
+qc = QCircuit([qr1, qr2])
+qft!(qc, qr1)
+@test qc == expqc
 
-# # inverse
-# expqc = QCircuit(3)
-# expqc.swap(0, 2)
-# expqc.h(0)
-# expqc.cp(0, 1, π/2)
-# expqc.h(1)
-# expqc.cp(1, 2, π/2)
-# expqc.cp(0, 2, π/4)
-# expqc.h(2)
 
-# qc = QCircuit(3)
-# qft!(qc, inverse=true)
-# @test qc == expqc
+
+# inverse
+expqr1 = QuantumRegister(3)
+expqr2 = QuantumRegister(3)
+expqc = QCircuit([expqr1, expqr2])
+expqc.swap(qr1[0], qr1[2])
+expqc.h(expqr1[0])
+expqc.cp(expqr1[0], expqr1[1], π/2)
+expqc.h(expqr1[1])
+expqc.cp(expqr1[1], expqr1[2], π/2)
+expqc.cp(expqr1[0], expqr1[2], π/4)
+expqc.h(expqr1[2])
+
+
+qr1 = QuantumRegister(3)
+qr2 = QuantumRegister(3)
+qc = QCircuit([qr1, qr2])
+qft!(qc, qr1, inverse=true)
+@test qc == expqc
 
 

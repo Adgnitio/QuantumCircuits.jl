@@ -42,7 +42,9 @@ function qft_rotations!(qc::Union{QCircuit, QuantumRegister}, code::Vector{T}, n
     end
 end
 
-function swap_registers!(circuit::QCircuit, n::Integer)
+function swap_registers!(circuit::QCircuit, reg::Union{QCircuit, QuantumRegister})
+    n = length(reg)
+
     for qubit in 0:Int(floor(n / 2))-1
         circuit.swap(qubit, n-qubit-1)
     end
@@ -51,14 +53,16 @@ function swap_registers!(circuit::QCircuit, n::Integer)
 end
 
 "QFT on the first n qubits in circuit"
-function qft!(circuit::QCircuit; doswap=true, inverse=false)
-    doswap && inverse && swap_registers!(circuit, circuit.qubits)
+function qft!(circuit::QCircuit, reg::Union{QCircuit, QuantumRegister} = circuit; doswap=true, inverse=false)
+    doswap && inverse && swap_registers!(circuit, reg)
+    println(circuit)
+    println(reg)
 
     code = QuantumGate[]
-    qft_rotations!(circuit, code, circuit.qubits, inverse=inverse)
+    qft_rotations!(reg, code, length(reg), inverse=inverse)
     circuit.add!(code)
 
-    doswap && !inverse && swap_registers!(circuit, circuit.qubits)
+    doswap && !inverse && swap_registers!(circuit, reg)
     
     return nothing
 end 

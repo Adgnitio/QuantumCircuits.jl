@@ -127,6 +127,10 @@ function Base.getindex(qc::QCircuit, idx::Int)
     return qc.vqubits[idx + 1]
 end
 
+"The size of register."
+Base.length(qc::QCircuit) = length(qc.vqubits)
+
+
 ###################################################################################
 @cbooify QCircuit (x, sx, y, z, h, cx, s, sdg, t, tdg, u, u3, rx, ry, rz, p, cp, swap, rzx,
                    u4, barrier, measure, add!, set!)
@@ -372,7 +376,7 @@ function measure!(qc::QCircuit, qubit::Integer, cbit::Integer, setMatrix::Bool=t
 
     measure!(qc, qc.vqubits[qubit + 1], qc.vcbits[cbit + 1], setMatrix)
 end
-function measure!(qc::QCircuit, qubits::AbstractVector{<:Integer}, cbits::AbstractVector{<:Integer})
+function measure!(qc::QCircuit, qubits::AbstractVector{T}, cbits::AbstractVector{T}) where T
     @assert length(qubits) == length(cbits) "The length of qubits and classical bits should be equal."
 
     for (i, j) in zip(eachindex(qubits), eachindex(cbits))
