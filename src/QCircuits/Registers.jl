@@ -43,6 +43,7 @@ end
 abstract type QuantumAbstractRegister <: Register{Qubit} end
 
 
+"The show method"
 function Base.show(io::IO, q::Qubit)
     if isnothing(q.index)
         print(io, "$(q.regIndex)")
