@@ -21,10 +21,7 @@ export Bit, Qubit, Cbit, Register, ClassicalRegister, QuantumRegister,
 abstract type Bit end
 
 "The abstract register"
-abstract type Register <: AbstractVector{Bit} end
-
-"The quantum abstract register"
-abstract type QuantumAbstractRegister <: Register end
+abstract type Register{T} <: AbstractVector{T} end
 
 "Classical bit"
 mutable struct Cbit <: Bit
@@ -41,6 +38,10 @@ mutable struct Qubit <: Bit
 
     Qubit(idx::Integer) = new(nothing, idx)
 end
+
+"The quantum abstract register"
+abstract type QuantumAbstractRegister <: Register{Qubit} end
+
 
 function Base.show(io::IO, q::Qubit)
     if isnothing(q.index)
@@ -100,7 +101,7 @@ end
 Base.show(io::IO, ::MIME{Symbol("text/plain")}, reg::Register) = show(io::IO, reg)
 
 # Classical Register
-@register(ClassicalRegister, Cbit, Register)
+@register(ClassicalRegister, Cbit, Register{Cbit})
 # Quantum Register
 @register(QuantumRegister, Qubit, QuantumAbstractRegister)
 

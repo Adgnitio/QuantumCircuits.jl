@@ -376,7 +376,7 @@ function measure!(qc::QCircuit, qubit::Integer, cbit::Integer, setMatrix::Bool=t
 
     measure!(qc, qc.vqubits[qubit + 1], qc.vcbits[cbit + 1], setMatrix)
 end
-function measure!(qc::QCircuit, qubits::AbstractVector{T}, cbits::AbstractVector{T}) where T
+function measure!(qc::QCircuit, qubits::AbstractVector{T}, cbits::AbstractVector{V}) where {T, V}
     @assert length(qubits) == length(cbits) "The length of qubits and classical bits should be equal."
 
     for (i, j) in zip(eachindex(qubits), eachindex(cbits))
