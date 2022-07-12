@@ -107,7 +107,7 @@ Base.show(io::IO, ::MIME{Symbol("text/plain")}, reg::Register) = show(io::IO, re
 @register(QuantumRegister, Qubit, QuantumAbstractRegister)
 
 # Quantum numbers state of register
-@enum QuantumNumberState Empty SettedNumber QFTbase NormalBase
+@enum QuantumNumberState Empty QFTbase NormalBase
 
 "The quantum number register"
 abstract type QuantumNumber <: QuantumAbstractRegister end
@@ -190,6 +190,5 @@ end
 "Iterable method"
 Base.iterate(reg::Register) = Base.iterate(reg.bits)
 Base.iterate(reg::Register, state) = Base.iterate(reg.bits, state)
-
 
 end  # module Registers

@@ -17,21 +17,40 @@ using QuantumCircuits.QCircuits.Circuit
 using QuantumCircuits.QCircuits.Registers
 using QuantumCircuits.QCircuits.QLib
 
-import QuantumCircuits.QCircuits.QBase: add!
+import QuantumCircuits.QCircuits.Registers as Reg
+import QuantumCircuits.QCircuits.QBase: qft!, add!, changebase!
+
+###############################################################
+#  Register - Change base                                     #
+###############################################################
+function changebase!(qc::QCircuit, reg::T, state::Reg.QuantumNumberState) where {T <: QuantumNumber}
+    if state == Reg.QFTbase && (reg.state == Reg.NormalBase || reg.state == Reg.Empty)
+        qft!(qc, reg, doswap=false)
+
+        reg.state = Reg.QFTbase
+        return nothing
+    elseif state == Reg.NormalBase && reg.state == Reg.QFTbase 
+        qft!(qc, reg, doswap=false, inverse=true)
+
+        reg.state = Reg.NormalBase
+        return nothing
+    end
+end
+
+changebase!(qc::QCircuit, reg::T, state::Reg.QuantumNumberState) where {T <: QuantumAbstractRegister} = nothing
 
 function add!(qc::QCircuit, reg::QuantumInteger, num::Number)
-    println("Test add!")
-
     # QFT
-    qft!(qc, reg, doswap=false)
+    changebase!(qc, reg, Reg.QFTbase)
 
     # Addition
-    for i in 0:2
+    for i in 0:length(reg)-1
         qc.p(reg[i], num * 2π/2^(i+1))
     end
 
     # Inverse QFT
-    qft!(qc, reg, doswap=false, inverse=true)
+    # we, don't do the inverse. We try to do this in leasy maner.
+    # qft!(qc, reg, doswap=false, inverse=true)
 end
 
 

@@ -174,4 +174,66 @@ for i in 0:(2^n_qubits-1)
      end
 end
 
+n_qubits = 5
+for i in 0:(2^n_qubits-1)
+     for j in 0:(2^n_qubits-1)
+          if i + j < 2^n_qubits
+               num_a = QuantumInteger(n_qubits)
+               nqc = QCircuit([num_a])
+               nqc.set!(num_a, i)
+               nqc.add!(num_a, j)
+
+               nqc.measure()
+               rs = getresults(nqc)
+               @test abs(rs[num_a][i+j] - 1.0) < 1e-8
+          end
+     end
+end
+
 ###############################################################
+
+n_qubits = 3
+for i in 0:(2^n_qubits-1)
+     for j in 0:(2^n_qubits-1)
+          if i + j < 2^n_qubits
+               num_a = QuantumInteger(n_qubits)
+               nqc = QCircuit([num_a])               
+               nqc.add!(num_a, i)
+               nqc.add!(num_a, j)
+
+               nqc.measure()
+               rs = getresults(nqc)
+               @test abs(rs[num_a][i+j] - 1.0) < 1e-8
+          end
+     end
+end
+
+n_qubits = 4
+for i in 0:(2^n_qubits-1)
+     for j in 0:(2^n_qubits-1)
+          for z in 0:(2^n_qubits-1)
+               if i + j + z < 2^n_qubits
+                    num_a = QuantumInteger(n_qubits)
+                    nqc = QCircuit([num_a])
+                    nqc.set!(num_a, z)
+                    nqc.add!(num_a, i)
+                    nqc.add!(num_a, j)
+
+                    nqc.measure()
+                    rs = getresults(nqc)
+                    @test abs(rs[num_a][i+j+z] - 1.0) < 1e-8
+               end
+          end
+     end
+end
+
+###############################################################
+
+# num_a = QuantumInteger(n_qubits)
+# nqc = QCircuit([num_a])
+# nqc.set!(num_a, 0)
+# nqc.add!(num_a, 1)
+# nqc.add!(num_a, 0)
+
+# nqc.measure()
+# rs = getresults(nqc)

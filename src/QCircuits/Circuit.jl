@@ -193,7 +193,7 @@ function set!(qc::QCircuit, reg::QuantumInteger, num::Integer)
     end
 
     # The number was set
-    reg.state = Reg.SettedNumber
+    reg.state = Reg.NormalBase
     nothing
 end
 
@@ -216,7 +216,7 @@ function set!(qc::QCircuit, reg::QuantumFloat, num::AbstractFloat)
     end
 
     # The number was set
-    reg.state = Reg.SettedNumber
+    reg.state = Reg.NormalBase
     nothing
 end
 
@@ -392,6 +392,10 @@ function measure!(qc::QCircuit)
     for r in qc.qRegisters
         if r.tomeasure
             l = length(r)
+
+            # For measure we need normal base
+            changebase!(qc, r, Reg.NormalBase)
+
             qc.measure(r, cr[i:i+l-1])
             i = i + l
         end

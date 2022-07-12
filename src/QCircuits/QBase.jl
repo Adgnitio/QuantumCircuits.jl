@@ -14,7 +14,7 @@ module QBase
 
 export QuantumCircuit, QuantumDevice, QuantumGate, QuantumObject,
        add!, tomatrix, setparameters!, simplify, measure!,
-       standardGateError, bindparameters!, decompose, needbedecompsed
+       standardGateError, bindparameters!, decompose, needbedecompsed, qft!, changebase!
 
 "Quantum object :)"
 abstract type QuantumObject end
@@ -55,5 +55,9 @@ needbedecompsed(qc::QuantumObject) = error("Please implement decompose function 
 Base.inv(qc::QuantumObject) = error("Please implement inv function for ", typeof(qc))
 
 measure!(qc::QuantumObject) = error("Please implement measure! function for ", typeof(qc))
+
+
+qft!(circuit::QuantumObject, reg::QuantumObject; doswap=true, inverse=false) = error("Please implement qft! function.")
+changebase!(qc::QuantumObject, reg::QuantumObject, state) = error("Please implement changebase! function.")
 
 end  # module QBase

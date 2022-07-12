@@ -17,7 +17,7 @@ using QuantumCircuits.QCircuits.Registers
 using QuantumCircuits.QCircuits.Circuit
 using QuantumCircuits.QCircuits.Gates: H, CP
 
-export qft!
+import QuantumCircuits.QCircuits.QBase: qft!
 
 "Performs qft on the first n qubits in circuit (without swaps)."
 function qft_rotations!(qc::Union{QCircuit, QuantumAbstractRegister}, code::Vector{T}, n::Integer) where T <: QuantumGate
