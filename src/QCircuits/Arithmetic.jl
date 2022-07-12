@@ -37,9 +37,9 @@ function changebase!(qc::QCircuit, reg::T, state::Reg.QuantumNumberState) where 
     end
 end
 
-changebase!(qc::QCircuit, reg::T, state::Reg.QuantumNumberState) where {T <: QuantumAbstractRegister} = nothing
+changebase!(::QCircuit, ::T, ::Reg.QuantumNumberState) where {T <: QuantumAbstractRegister} = nothing
 
-function add!(qc::QCircuit, reg::QuantumInteger, num::Number)
+function innerAdd!(qc::QCircuit, reg::QuantumNumber, num::Number)
     # QFT
     changebase!(qc, reg, Reg.QFTbase)
 
@@ -53,5 +53,16 @@ function add!(qc::QCircuit, reg::QuantumInteger, num::Number)
     # qft!(qc, reg, doswap=false, inverse=true)
 end
 
+function add!(qc::QCircuit, reg::QuantumInteger, num::Number)
+    @assert num < 2^reg.integer "The number $num is out of the register with $(reg.integer) qubits."
+
+    innerAdd!(qc, reg, num)
+end
+
+function add!(qc::QCircuit, reg::QuantumFloat, num::Number)
+    val = getIntValue(reg, num)
+
+    innerAdd!(qc, reg, val)
+end
 
 end  # module Arithmetic

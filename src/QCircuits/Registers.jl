@@ -15,7 +15,8 @@ module Registers
 using QuantumCircuits.QCircuits.QBase
 
 export Bit, Qubit, Cbit, Register, ClassicalRegister, QuantumRegister,
-       QuantumNumber, QuantumInteger, QuantumFloat, QuantumAbstractRegister, getid, setid
+       QuantumNumber, QuantumInteger, QuantumFloat, QuantumAbstractRegister, getid, setid,
+       getIntValue
 
 "The abstract bit"
 abstract type Bit end
@@ -166,6 +167,16 @@ function Base.show(io::IO, reg::QuantumFloat)
     end
 end
 
+function getIntValue(reg::QuantumFloat, num::Number)
+    integer_part = Int(floor(num))
+    fractional_part = (num - integer_part) * 2^reg.fractional
+    fractional_part_int = Int(fractional_part)
+
+    @assert integer_part < 2^reg.integer "The number $num is out of the register with $(reg.integer) qubits."
+    @assert abs(fractional_part_int - fractional_part) < 1e-10 "The number $num is out of the register fractional part with $(reg.fractional) qubits."
+
+    return integer_part * 2^reg.fractional + fractional_part_int
+end
 
 "The size of register."
 Base.length(reg::Register) = length(reg.bits)

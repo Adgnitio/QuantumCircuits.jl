@@ -181,9 +181,8 @@ measure(qc::QCircuit, q, c) = measure!(qc, q, c)
 measure(qc::QCircuit) = measure!(qc)
 
 
-function set!(qc::QCircuit, reg::QuantumInteger, num::Integer)
-    @assert reg.state == Reg.Empty "Unable to set used register."
-    @assert num < 2^reg.integer "The number $num is out of the register with $(reg.integer) qubits."
+function innerSet!(qc::QCircuit, reg::QuantumNumber, num::Integer)
+    @assert reg.state == Reg.Empty "Unable to set used register."    
 
     # Set the value
     for (i, v) in enumerate(reverse(bitstring(num)))
@@ -197,27 +196,16 @@ function set!(qc::QCircuit, reg::QuantumInteger, num::Integer)
     nothing
 end
 
-function set!(qc::QCircuit, reg::QuantumFloat, num::AbstractFloat)
-    @assert reg.state == Reg.Empty "Unable to set used register."
+function set!(qc::QCircuit, reg::QuantumInteger, num::Integer)
+    @assert num < 2^reg.integer "The number $num is out of the register with $(reg.integer) qubits."
 
-    integer_part = Int(floor(num))
-    fractional_part = (num - integer_part) * 2^reg.fractional
-    fractional_part_int = Int(fractional_part)
+    innerSet!(qc, reg, num)
+end
 
-    @assert integer_part < 2^reg.integer "The number $num is out of the register with $(reg.integer) qubits."
-    @assert abs(fractional_part_int - fractional_part) < 1e-10 "The number $num is out of the register fractional part with $(reg.fractional) qubits."
+function set!(qc::QCircuit, reg::QuantumFloat, num::Number)
+    val = getIntValue(reg, num)
 
-
-    # Set the value
-    for (i, v) in enumerate(reverse(bitstring(integer_part * 2^reg.fractional + fractional_part_int)))
-        if v == '1'
-            qc.x(reg[i-1])
-        end
-    end
-
-    # The number was set
-    reg.state = Reg.NormalBase
-    nothing
+    innerSet!(qc, reg, val)
 end
 
 ###################################################################################

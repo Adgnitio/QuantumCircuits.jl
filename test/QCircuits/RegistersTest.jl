@@ -228,6 +228,51 @@ for i in 0:(2^n_qubits-1)
 end
 
 ###############################################################
+#            QuantumFloat                                     #
+###############################################################
+#  Set
+n_qubits = 3
+n_frac = 2
+for i in 0:(2^(n_qubits + n_frac) - 1)
+     num_a = QuantumFloat(n_qubits, n_frac)
+     nqc = QCircuit([num_a])
+
+     num = i / (2^n_frac)
+
+     nqc.set!(num_a, num)
+
+     nqc.measure()
+     rs = getresults(nqc)
+     #rs[num_a]
+     @test abs(rs[num_a][num] - 1.0) < 1e-8
+end
+
+
+n_qubits = 3
+n_frac = 2
+for i in 0:(2^(n_qubits + n_frac) - 1)
+     for j in 0:(2^(n_qubits + n_frac) - 1)
+          num = i / (2^n_frac)
+          num2 = j / (2^n_frac)
+
+          if num + num2 < 2^n_qubits
+               num_a = QuantumFloat(n_qubits, n_frac)
+               nqc = QCircuit([num_a])
+
+               
+               nqc.set!(num_a, num)
+               nqc.add!(num_a, num2)
+
+               nqc.measure()
+               rs = getresults(nqc)
+               #rs[num_a]
+               @test abs(rs[num_a][num + num2] - 1.0) < 1e-8
+          end
+     end
+end
+
+
+###############################################################
 
 # num_a = QuantumInteger(n_qubits)
 # nqc = QCircuit([num_a])
