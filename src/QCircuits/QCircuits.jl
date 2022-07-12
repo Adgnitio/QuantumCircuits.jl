@@ -22,9 +22,11 @@ include("ComplexGates.jl")
 include("Graph.jl")
 include("Qiskit.jl")
 include("Circuit.jl")
+include("QLib.jl")
+include("Arithmetic.jl")
 
-# using QGen.Quantum.QBase
-#
-# export QuantumCircuit, QuantumDevice, QuantumGate, add!
+using QuantumCircuits.QCircuits.Circuit
+
+export QCircuit
 
 end # module

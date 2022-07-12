@@ -18,7 +18,7 @@ using QuantumCircuits.QCircuits.Gates: Parameter
 using QuantumCircuits.QCircuits.Registers
 
 import QuantumCircuits.QCircuits.Gates: getqubits, getqubitsids, appendparams!,
-       appendRandParams!, setparameters!, getArgs, decompose, bindparameters!
+       appendRandParams!, setparameters!, getArgs, decompose, bindparameters!, needbedecompsed
 
 export U4
 
@@ -90,5 +90,6 @@ function decompose(gate::U4)
     ]
 end
 
+needbedecompsed(::U4) = true
 
 end  # module ComplexGates

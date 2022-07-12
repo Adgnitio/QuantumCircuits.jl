@@ -19,11 +19,11 @@ Our goal is preparing a log-normal distribution with μ = 0 and σ = 0.1. With f
 # 3 The solution
 See the file lognormal_state_preparation.jl which contains the full solution code.
 
-## 3.1 The ansact
-First, we have to choose the ansact. I've decided to use ansact which looks like a Christmas tree. We start with the qubits in the midle with u4 gate and then we add the u4 gates up and down.
+## 3.1 The Ansatz
+First, we have to choose the Ansatz. I've decided to use Ansatz which looks like a Christmas tree. We start with the qubits in the midle with u4 gate and then we add the u4 gates up and down. 
 
 ```julia
-# Generate ansact
+# Generate Ansatz
 qr = QuantumRegister(N)
 cr = ClassicalRegister(N)
 qc = QCircuit(qr, cr)
@@ -227,7 +227,7 @@ val, x, itr = gradientDescent(loss_stage1, loss_stage1', params, α=0.0001, maxI
 In stage one we found the parameter which works well in the evenly distributed discretization. But we can change the discretization method as well, so we treat the discretization as a problem parameter in optimization. We encode the parameters in three parts: 
 * First is the start value of discretization
 * Next, we have the array of difference values between two points in discretization
-* And the last part is the ansact/model parameters.
+* And the last part is the Ansatz/model parameters.
 
 To start the optimization we use the parameters and discretization from stage 1.
 ```julia
@@ -290,7 +290,7 @@ end
 println(opt_x)
 ```
 
-And finaly we generate the Python Qiskit code of the ansact circuit with the best parameters.
+And finaly we generate the Python Qiskit code of the Ansatz circuit with the best parameters.
 ```julia
 println(toPythonQiskitCode(qc))
 ```

@@ -32,7 +32,7 @@ end
 
 
 qr = QuantumRegister(1)
-g = U3(qr[0], 1.0, 2.0, 3.0)
+g = U3(qr.bits[1], 1.0, 2.0, 3.0)
 @test getparam(g) == ParamT[]
 @test getRandParam(g) == ParamT[]
 @test length(g) == 0
@@ -41,7 +41,7 @@ g = U3(qr[0], 1.0, 2.0, 3.0)
 setparameters!(g, [])
 
 
-g = U3(qr[0], ParameterT(1.0), ParameterT(2.0), ParameterT(3.0))
+g = U3(qr.bits[1], ParameterT(1.0), ParameterT(2.0), ParameterT(3.0))
 @test getparam(g) == ParamT[1.0, 2.0, 3.0]
 @test length(getRandParam(g)) == 3
 @test getparam(g) != getRandParam(g)
@@ -54,7 +54,7 @@ setparameters!(g, [-2.0, -1.0, -4.0])
 @test getparam(g) == ParamT[-2.0, -1.0, -4.0]
 
 
-g = U3(qr[0])
+g = U3(qr.bits[1],)
 @test length(getparam(g)) == 3
 @test length(getRandParam(g)) == 3
 @test getparam(g) != getRandParam(g)
@@ -64,7 +64,7 @@ setparameters!(g, [2.0, 1.0, 4.0])
 
 
 qr = QuantumRegister(1)
-g = U3(qr[0], ParameterT(1.0), ParameterT(2.0), 3.0)
+g = U3(qr.bits[1], ParameterT(1.0), ParameterT(2.0), 3.0)
 @test getparam(g) == ParamT[1.0, 2.0]
 @test length(getRandParam(g)) == 2
 @test getparam(g) != getRandParam(g)
@@ -81,7 +81,7 @@ using QuantumCircuits.QCircuits.ComplexGates
 using QuantumCircuits.QCircuits.ComplexGates: U4_params
 
 qr = QuantumRegister(2)
-g = U4(qr[0], qr[1])
+g = U4(qr.bits[1], qr.bits[2])
 p = getparam(g)
 @test length(p) == U4_params
 rp = getRandParam(g)

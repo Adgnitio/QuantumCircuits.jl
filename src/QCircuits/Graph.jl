@@ -25,7 +25,7 @@ struct DirectedGraph{IndexT<:Integer}
     start_nodes::Vector{IndexT}
     end_nodes::Vector{IndexT}
     vertices::Vector{QuantumGate}
-    vertices_map::Dict{QuantumGate, IndexT}
+    vertices_map::Dict{QuantumGate, Set{IndexT}}
     edges::Vector{Pair{IndexT, IndexT}}
     #sources::Vector{QuantumGate}
     #targets::Vector{QuantumGate}
@@ -41,7 +41,7 @@ function DirectedGraph{IndexT}(qubits::Int, inline_optimization) where IndexT<:I
                       zeros(IndexT, qubits),
                       zeros(IndexT, qubits),
                       QuantumGate[],
-                      Dict{QuantumGate, IndexT}(),
+                      Dict{QuantumGate, Set{IndexT}}(),
                       Vector{Pair{IndexT, IndexT}}(),
                       Set{IndexT}[],
                       Vector{Set{Pair{Integer, IndexT}}}[],
@@ -52,6 +52,8 @@ end
 
 "The index of start and end node."
 const StartEndNode = 0
+"The empty node"
+const EmptyNode = -1
 "Mapping from qubit number to line number."
 qubitToLine(q) = q + 1
 
@@ -65,25 +67,15 @@ function add!(g::DirectedGraph{IndexT}, gate::QuantumGate) where IndexT<:Integer
 
     # Chceck if this is and the previous are u3 gates with prameters 
     # In that case we can skip adding this gate
-    if g.inline_optimization &&         # inline optimization is enabled
-       length(qubits) == 1 &&         # only single qubit
-       typeof(gate) == U3 &&          # u3 gate
-       onlyParameters(gate)           # use all 3 parameters
-       # get last qubit
-        q = qubitToLine(qubits[1]) # qiskit qubit start indexes from 0
-        last_end = g.end_nodes[q]
-        if last_end != StartEndNode &&                      # if there is a previous
-           typeof(g.vertices[last_end]) == U3 &&            # u3 gate
-           onlyParameters(g.vertices[last_end])             # use all 3 parameters
-            # We can skip add this gate
-            return nothing
-        end
+    if g.inline_optimization # inline optimization is enabled
+        inlineoptimization!(g, gate) && return nothing # We can skip add this gate
     end
 
     # calculate gate index
     push!(g.vertices, gate)
     idx = length(g.vertices)
-    g.vertices_map[gate] = idx
+    vertices_map_dic = get!(g.vertices_map, gate, Set{IndexT}())
+    push!(vertices_map_dic, idx)
 
     # add in/out edges sets
     push!(g.in_edges, Set{IndexT}())
@@ -112,6 +104,96 @@ function add!(g::DirectedGraph{IndexT}, gate::QuantumGate) where IndexT<:Integer
     end
 
     nothing
+end
+
+function remove!(g::DirectedGraph{IndexT}, gate::QuantumGate) where IndexT<:Integer
+    qubits = getqubitsids(gate)
+    @assert all(q < g.qubits for q in qubits) "Qubits in gate $gate is out of DAG qubits range $(g.qubits)."
+    @assert all(q < g.qubits for q in qubits) "Qubits in gate $gate is out of DAG qubits range $(g.qubits)."
+
+
+    # Get gate index
+    @assert !isempty(g.vertices_map[gate]) "Unable to remove, removed gate."
+    idx = maximum(g.vertices_map[gate])
+    
+
+    # Clear the gate mapping
+    delete!(g.vertices_map[gate], idx)
+
+    # actualize edge
+    for ingate in g.in_edges[idx]
+        # this is start gate
+        if ingate == StartEndNode
+            # Clear all qubits
+            for q in qubits
+                q = qubitToLine(q) # qiskit qubit start indexes from 0
+                g.start_nodes[q] = StartEndNode
+                g.end_nodes[q] = StartEndNode
+            end
+        else
+            # Update end nodes 
+            for q in getqubitsids(g.vertices[ingate])
+                if q in qubits
+                    q = qubitToLine(q) # qiskit qubit start indexes from 0
+                    g.end_nodes[q] = ingate
+                    delete!(g.out_edges[ingate], (q => idx))
+                end
+            end            
+
+            # Delete connections
+            deleteat!(g.edges, findall(x -> x == (ingate => idx), g.edges))
+        end
+
+        # Delete in edge
+        delete!(g.in_edges[idx], ingate)        
+    end    
+
+    nothing
+end
+
+function inlineoptimization!(g::DirectedGraph{IndexT}, gate::QuantumGate) where IndexT<:Integer
+    qubits = getqubitsids(gate)
+
+    # Chceck if this is and the previous are u3 gates with prameters 
+    # In that case we can skip adding this gate
+    if length(qubits) == 1 &&         # only single qubit
+       typeof(gate) == U3 &&          # u3 gate
+       onlyParameters(gate)           # use all 3 parameters
+        # get last qubit
+        q = qubitToLine(qubits[1]) # qiskit qubit start indexes from 0
+        last_end = g.end_nodes[q]
+        if last_end != StartEndNode &&                   # if there is a previous
+           typeof(g.vertices[last_end]) == U3 &&            # u3 gate
+           onlyParameters(g.vertices[last_end])             # use all 3 parameters
+            # We can skip add this gate
+            return true
+        end
+    elseif length(qubits) == 2 &&         # only single qubit
+           typeof(gate) == CX             # CX gate    
+           
+        qcontrol = qubitToLine(qubits[1])
+        qtarget = qubitToLine(qubits[2])
+        if g.end_nodes[qcontrol] != StartEndNode && # if there is a previous
+           g.end_nodes[qtarget] != StartEndNode    # if there is a previous
+            last_gate_on_control = g.vertices[g.end_nodes[qcontrol]]
+            last_gate_on_target = g.vertices[g.end_nodes[qtarget]]
+            
+            if typeof(last_gate_on_control) == CX &&         # CX gate
+               last_gate_on_control == gate &&               # The same gate on target and control
+               last_gate_on_target == gate                   # The same gate on target and control
+                
+                # remove previous CX
+                remove!(g, last_gate_on_control)
+
+                # We can skip add this gate
+                return true
+            end
+        end
+
+        return false
+    end
+
+    return false
 end
 
 function to_vector(g::DirectedGraph{IndexT})::Vector{QuantumGate} where IndexT<:Integer

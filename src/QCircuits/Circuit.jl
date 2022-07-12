@@ -20,6 +20,7 @@ using QuantumCircuits.QCircuits.ComplexGates: U4_params
 using QuantumCircuits.QCircuits.OtherGates
 using QuantumCircuits.QCircuits.Instructions
 using QuantumCircuits.QCircuits.Registers
+import QuantumCircuits.QCircuits.Registers as Reg
 using QuantumCircuits.QCircuits.Qiskit
 using QuantumCircuits.QCircuits.Graph
 using QuantumCircuits.QCircuits.Math
@@ -32,10 +33,10 @@ using LinearAlgebra
 using CBOOCall: @cbooify
 
 import QuantumCircuits.QCircuits.QBase: add!, tomatrix, setparameters!, simplify,
-       standardGateError, decompose, measure!, bindparameters!
+       standardGateError, decompose, measure!, bindparameters!, needbedecompsed
 import Base.show
 
-export QCircuit, getparameters, getRandParameters, toString, setClassicalRegister!, toPythonQiskitCode
+export QCircuit, getparameters, getRandParameters, toString, setClassicalRegister!, toPythonQiskitCode, ismeasured
 
 "Nothing function"
 const nop = () -> nothing
@@ -73,7 +74,7 @@ c0: 3/═══════════════
 """
 mutable struct QCircuit <: QuantumCircuit
     qubits::Int
-    qRegisters::Vector{QuantumRegister}
+    qRegisters::Vector{QuantumAbstractRegister}
     cRegisters::Vector{ClassicalRegister}
     dcg::DirectedGraph{Int}
     has_code::Bool
@@ -83,7 +84,7 @@ mutable struct QCircuit <: QuantumCircuit
     measures::Vector{Pair{Qubit, Cbit}}
     measures_matrix::Matrix{Float64}
 
-    function QCircuit(qRegs::Vector{QuantumRegister}, cRegs::Vector{ClassicalRegister}; inline_optimization=true)
+    function QCircuit(qRegs::Vector{<:QuantumAbstractRegister}, cRegs::Vector{ClassicalRegister}; inline_optimization=true)
         n = sum([length(i) for i in qRegs])
 
         qc = new(n, qRegs, cRegs, DirectedGraph{Int}(n, inline_optimization), false, QuantumGate[], Qubit[], ClassicalRegister[], Pair{Qubit, Cbit}[], eye(2^n))
@@ -108,10 +109,10 @@ mutable struct QCircuit <: QuantumCircuit
     end
 end
 QCircuit(n::Integer; inline_optimization=true) = QCircuit([QuantumRegister(n)], [ClassicalRegister(n)], inline_optimization=inline_optimization)
-QCircuit(qReg::QuantumRegister, cReg::ClassicalRegister; inline_optimization=true) = QCircuit([qReg], [cReg], inline_optimization=inline_optimization)
-QCircuit(reg::QuantumRegister; inline_optimization=true) = QCircuit([reg], ClassicalRegister[], inline_optimization=inline_optimization)
-QCircuit(regs::Vector{QuantumRegister}; inline_optimization=true) = QCircuit(regs, [ClassicalRegister(sum([length(i) for i in regs]))], inline_optimization=inline_optimization)
-QCircuit(regs::Vector{QuantumRegister}, cReg::ClassicalRegister; inline_optimization=true) = QCircuit(regs, [cReg], inline_optimization=inline_optimization)
+QCircuit(qReg::QuantumAbstractRegister, cReg::ClassicalRegister; inline_optimization=true) = QCircuit([qReg], [cReg], inline_optimization=inline_optimization)
+QCircuit(reg::QuantumAbstractRegister; inline_optimization=true) = QCircuit([reg], ClassicalRegister[ClassicalRegister(reg.tomeasure ? length(reg) : 0)], inline_optimization=inline_optimization)
+QCircuit(regs::Vector{<:QuantumAbstractRegister}; inline_optimization=true) = QCircuit(regs, [ClassicalRegister(sum([(i.tomeasure ? length(i) : 0) for i in regs]))], inline_optimization=inline_optimization)
+QCircuit(regs::Vector{<:QuantumAbstractRegister}, cReg::ClassicalRegister; inline_optimization=true) = QCircuit(regs, [cReg], inline_optimization=inline_optimization)
 function QCircuit(qc::QCircuit)
     qregs = [QuantumRegister(length(r), r.name) for r in qc.qRegisters]
     cregs = [ClassicalRegister(length(r), r.name) for r in qc.cRegisters]
@@ -120,7 +121,19 @@ function QCircuit(qc::QCircuit)
 end
 
 ###################################################################################
-@cbooify QCircuit (x, sx, y, z, h, cx, s, sdg, t, tdg, u, u3, rx, ry, rz, rzx, u4, barrier, measure)
+function Base.getindex(qc::QCircuit, idx::Int)
+    @assert idx >=0 && idx < qc.qubits "The $idx is out of bound for $(qc.qubits) circuits."
+
+    return qc.vqubits[idx + 1]
+end
+
+"The size of register."
+Base.length(qc::QCircuit) = length(qc.vqubits)
+
+
+###################################################################################
+@cbooify QCircuit (x, sx, y, z, h, cx, s, sdg, t, tdg, u, u3, rx, ry, rz, p, cp, swap, rzx,
+                   u4, barrier, measure, add!, set!)
 
 "Add function macro"
 macro addfunction(name, gate)
@@ -145,6 +158,7 @@ end
 @addfunction(z, Z)
 @addfunction(h, H)
 @addfunction(cx, CX)
+@addfunction(swap, Swap)
 @addfunction(s, S)
 @addfunction(sdg, Sd)
 @addfunction(t, T)
@@ -154,15 +168,45 @@ end
 @addfunction1param(rx, Rx)
 @addfunction1param(ry, Ry)
 @addfunction1param(rz, Rz)
+@addfunction1param(p, P)
 
 @addfunction3param(u3, U3)
 
 rzx(qc::QCircuit, q1, q2, θ=ParameterT(rand()*2π)) = add!(qc, Rzx, q1, q2, θ)
 u4(qc::QCircuit, q1, q2, params=[ParameterT(rand() * 2π) for i in 1:U4_params]) = add!(qc, U4, q1, q2, params)
+cp(qc::QCircuit, q1, q2, λ=ParameterT(rand()*2π)) = add!(qc, CP, q1, q2, λ)
 
 barrier(qc::QCircuit) = add!(qc, Barrier(qc.vqubits))
 measure(qc::QCircuit, q, c) = measure!(qc, q, c)
+measure(qc::QCircuit) = measure!(qc)
 
+
+function innerSet!(qc::QCircuit, reg::QuantumNumber, num::Integer)
+    @assert reg.state == Reg.Empty "Unable to set used register."    
+
+    # Set the value
+    for (i, v) in enumerate(reverse(bitstring(num)))
+        if v == '1'
+            qc.x(reg[i-1])
+        end
+    end
+
+    # The number was set
+    reg.state = Reg.NormalBase
+    nothing
+end
+
+function set!(qc::QCircuit, reg::QuantumInteger, num::Integer)
+    @assert num < 2^reg.integer "The number $num is out of the register with $(reg.integer) qubits."
+
+    innerSet!(qc, reg, num)
+end
+
+function set!(qc::QCircuit, reg::QuantumFloat, num::Number)
+    val = getIntValue(reg, num)
+
+    innerSet!(qc, reg, val)
+end
 
 ###################################################################################
 
@@ -213,6 +257,7 @@ end
 function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Qubit, qubit2::Qubit)
     @assert qubit1 in qc.vqubits "Qubits is out of circuit qubits range."
     @assert qubit2 in qc.vqubits "Qubits is out of circuit qubits range."
+    @assert qubit1 != qubit2 "Qubits have to be different: $qubit1, $qubit2."
 
     add!(qc.dcg, gate(qubit1, qubit2))
     qc.has_code = false
@@ -221,6 +266,7 @@ end
 function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Integer, qubit2::Integer)
     @assert qubit1 < qc.qubits "Qubits $qubit1 is out of circuit qubits range $(qc.qubits)."
     @assert qubit2 < qc.qubits "Qubits $qubit2 is out of circuit qubits range $(qc.qubits)."
+    @assert qubit1 != qubit2 "Qubits have to be different: $qubit1, $qubit2."
 
     add!(qc, gate, qc.vqubits[qubit1 + 1], qc.vqubits[qubit2 + 1])
 
@@ -229,6 +275,7 @@ end
 function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Qubit, qubit2::Qubit, params)
     @assert qubit1 in qc.vqubits "Qubits is out of circuit qubits range."
     @assert qubit2 in qc.vqubits "Qubits is out of circuit qubits range."
+    @assert qubit1 != qubit2 "Qubits have to be different: $qubit1, $qubit2."
 
     if isnothing(params)
         add!(qc.dcg, gate(qubit1, qubit2))
@@ -241,6 +288,7 @@ end
 function add!(qc::QCircuit, gate::Type{<:QuantumGate}, qubit1::Integer, qubit2::Integer, params)
     @assert qubit1 < qc.qubits "Qubits $qubit1 is out of circuit qubits range $(qc.qubits)."
     @assert qubit2 < qc.qubits "Qubits $qubit2 is out of circuit qubits range $(qc.qubits)."
+    @assert qubit1 != qubit2 "Qubits have to be different: $qubit1, $qubit2."
 
     add!(qc, gate, qc.vqubits[qubit1 + 1], qc.vqubits[qubit2 + 1], params)
 
@@ -302,6 +350,7 @@ function measure!(qc::QCircuit, qubit::Qubit, cbit::Cbit, setMatrix::Bool=true)
     if setMatrix
         setMeasureMatrix!(qc)
     end
+    nothing
 end
 
 "Add measures to circuit"
@@ -311,7 +360,7 @@ function measure!(qc::QCircuit, qubit::Integer, cbit::Integer, setMatrix::Bool=t
 
     measure!(qc, qc.vqubits[qubit + 1], qc.vcbits[cbit + 1], setMatrix)
 end
-function measure!(qc::QCircuit, qubits::AbstractVector{<:Integer}, cbits::AbstractVector{<:Integer})
+function measure!(qc::QCircuit, qubits::AbstractVector{T}, cbits::AbstractVector{V}) where {T, V}
     @assert length(qubits) == length(cbits) "The length of qubits and classical bits should be equal."
 
     for (i, j) in zip(eachindex(qubits), eachindex(cbits))
@@ -319,7 +368,28 @@ function measure!(qc::QCircuit, qubits::AbstractVector{<:Integer}, cbits::Abstra
     end
 
     setMeasureMatrix!(qc)
+    nothing
 end
+
+"Add measures to circuit"
+function measure!(qc::QCircuit)
+    @assert length(qc.cRegisters) == 1 "Something go wrong."
+    cr = qc.cRegisters[1]
+
+    i = 0
+    for r in qc.qRegisters
+        if r.tomeasure
+            l = length(r)
+
+            # For measure we need normal base
+            changebase!(qc, r, Reg.NormalBase)
+
+            qc.measure(r, cr[i:i+l-1])
+            i = i + l
+        end
+    end
+end
+
 
 function setMeasureMatrix!(qc::QCircuit)
     measured = [(i-1, v) for (i, v) in enumerate(sort!([getid(q)  for (q, c) in qc.measures]))]
@@ -341,6 +411,15 @@ function setMeasureMatrix!(qc::QCircuit)
     qc.measures_matrix = mes_matrix
 end
 
+function ismeasured(qc, reg)
+    @assert reg in qc.qRegisters "Regiester has to be in circuits."
+
+    # measured qubits
+    mes_qubits = Set([getid(k[1]) for k in qc.measures])
+
+    # check if all qubits were measured
+    return all(getid(b) in mes_qubits for b in reg.bits)
+end
 
 ###################################################################################
 
@@ -538,8 +617,47 @@ function decompose(qc::QCircuit)
         end
     end
 
+    # add measrments
+    for (q, c) in qc.measures        
+        newqc.measure(getid(q), getid(c))
+   end
+
     return newqc
 end
+
+function decompose(gate::CP)
+#      ┌────────┐
+# q_0: ┤ P(λ/2) ├──■───────────────■────────────
+#      └────────┘┌─┴─┐┌─────────┐┌─┴─┐┌────────┐
+# q_1: ──────────┤ X ├┤ P(-λ/2) ├┤ X ├┤ P(λ/2) ├
+#                └───┘└─────────┘└───┘└────────┘   
+    return [
+        P(gate.control, gate.λ/2),
+        CX(gate.control, gate.target),
+        P(gate.target, -gate.λ/2),
+        CX(gate.control, gate.target),
+        P(gate.target, gate.λ/2)
+    ]
+end
+
+function decompose(gate::Swap)
+#           ┌───┐     
+# q_0: ──■──┤ X ├──■──
+#      ┌─┴─┐└─┬─┘┌─┴─┐
+# q_1: ┤ X ├──■──┤ X ├
+#      └───┘     └───┘ 
+    return [
+        CX(gate.control, gate.target),
+        CX(gate.target, gate.control),
+        CX(gate.control, gate.target)        
+    ]
+end
+
+
+needbedecompsed(qc::QCircuit) = any(needbedecompsed(gate) for gate in getCode(qc))
+needbedecompsed(::CP) = true
+needbedecompsed(::Swap) = true
+
 
 function simplify(qc::QCircuit)
     newqc = QCircuit(qc)

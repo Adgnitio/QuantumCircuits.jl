@@ -21,7 +21,7 @@ makedocs(
         "Introduction" => "index.md",
         "Quick Start guide" => "quickguide.md",
         "Quantum Gates Library" => [
-            "Single-qubit gates s" => "0_Single-qubit-gates.md",
+            "Single-qubit gates" => "0_Single-qubit-gates.md",
             "Two-qubit gates" => "1_Two-qubit-gates.md",
         ],        
         "Novel algorithm to Simulation on NISQ device" => [
@@ -44,6 +44,7 @@ makedocs(
                 "Instructions" => "QCircuits/Instructions.md",
                 "Math" => "QCircuits/Math.md",
                 "QBase" => "QCircuits/QBase.md",  
+                "QLib" => "QCircuits/QLib.md",  
             ],
             "Execute" => "Execute.md",
             "QML" => [

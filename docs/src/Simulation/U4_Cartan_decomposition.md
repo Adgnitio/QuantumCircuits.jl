@@ -129,7 +129,7 @@ c1: 2/════════════════════════�
 «                                     
 ```
 
-We have to choose the ansact, in our case this will be a U4 gate and in that case, we are sure that we always can find the correct parameters.
+We have to choose the Ansatz, in our case this will be a U4 gate and in that case, we are sure that we always can find the correct parameters.
 
 ```julia
 qr = QuantumRegister(2)
@@ -154,7 +154,7 @@ q2_1: ─┤ U3(5.0677,5.7902,6.2463) ├──■──┤ Ry(4.4635) ├┤ X 
 «      └──────────────────────────┘
 ```
 
-Now we can find the parameter of our ansact that perfectly fit our expected unitary matrix.
+Now we can find the parameter of our Ansatz that perfectly fit our expected unitary matrix.
 
 
 ```julia
