@@ -203,15 +203,15 @@ res_dev_los, res_dev_der = fn(pa)
 #############################################################################
 
 qr = QuantumRegister(2)
-qc = QCircuit(qr)
+cr = ClassicalRegister(1)
+qc = QCircuit(qr, cr)
 qc.h(0)
 qc.x(1)
 @test err(execute(backend, qc), [0.0, 0.0, 0.5, 0.5]) < 1e-5
 @test qc.measures_matrix == eye(4)
 
 # Add measures
-cr = ClassicalRegister(1)
-setClassicalRegister!(qc, cr)
+#setClassicalRegister!(qc, cr)
 qc.measure([0], [0])
 @test err(execute(backend, qc), [0.5, 0.5]) < 1e-5
 @test qc.measures_matrix == [1 0 1 0; 0 1 0 1]

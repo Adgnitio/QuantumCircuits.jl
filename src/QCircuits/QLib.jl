@@ -17,32 +17,23 @@ using QuantumCircuits.QCircuits.Registers
 using QuantumCircuits.QCircuits.Circuit
 using QuantumCircuits.QCircuits.Gates: H, CP
 
+export qft!
 
 "Performs qft on the first n qubits in circuit (without swaps)."
-function qft_rotations!(qc::Union{QCircuit, QuantumRegister}, code::Vector{T}, n::Integer; inverse=false) where T <: QuantumGate
-    # Break the recurence
-    n == 0 && return nothing
-
+function qft_rotations!(qc::Union{QCircuit, QuantumAbstractRegister}, code::Vector{T}, n::Integer) where T <: QuantumGate
     n -= 1
-    #circuit.h(n)
     push!(code, H(qc[n]))
-    for qubit in 0:(n-1)
-        #circuit.cp(qubit, n, π/2^(n-qubit))
-        push!(code, CP(qc[qubit], qc[n], π/2^(n-qubit)))
+    for i in (n-1):-1:0
+        for j in n:-1:(i+1)
+            push!(code, CP(qc[i], qc[j], π/2^(j-i)))
+        end
+        push!(code, H(qc[i]))
     end
 
-    # At the end of our function, we call the same function again on
-    # the next qubits (we reduced n by one earlier in the function)
-    qft_rotations!(qc, code, n)
-
-    if inverse
-        return reverse!(code)
-    else
-        return code
-    end
+    return code
 end
 
-function swap_registers!(circuit::QCircuit, reg::Union{QCircuit, QuantumRegister})
+function swap_registers!(circuit::QCircuit, reg::Union{QCircuit, QuantumAbstractRegister})
     n = length(reg)
 
     for qubit in 0:Int(floor(n / 2))-1
@@ -53,13 +44,16 @@ function swap_registers!(circuit::QCircuit, reg::Union{QCircuit, QuantumRegister
 end
 
 "QFT on the first n qubits in circuit"
-function qft!(circuit::QCircuit, reg::Union{QCircuit, QuantumRegister} = circuit; doswap=true, inverse=false)
+function qft!(circuit::QCircuit, reg::Union{QCircuit, QuantumAbstractRegister} = circuit; doswap=true, inverse=false)
     doswap && inverse && swap_registers!(circuit, reg)
-    println(circuit)
-    println(reg)
 
     code = QuantumGate[]
-    qft_rotations!(reg, code, length(reg), inverse=inverse)
+    qft_rotations!(reg, code, length(reg))
+    
+    # Inverse
+    if inverse
+        code = [inv(gate) for gate in reverse!(code)]
+    end
     circuit.add!(code)
 
     doswap && !inverse && swap_registers!(circuit, reg)

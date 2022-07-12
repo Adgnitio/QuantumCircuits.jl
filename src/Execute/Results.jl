@@ -62,8 +62,9 @@ function getresults(qc::QCircuit, params=nothing)
     else
         nM = M
     end
+    nor_sum = 0.0
     for (i, v) in enumerate(ret)
-        if v > 0                        
+        if v > 1e-10                        
             bs = reverse(bitstring(i-1)[end-nM+1:end])
             if N > M && M != 0
                 next = 1
@@ -81,7 +82,14 @@ function getresults(qc::QCircuit, params=nothing)
 
             bs = reverse(String([bs[i] for i in q2c]))
             push!(results, bs => v)
+
+            nor_sum += v
         end
+    end
+
+    # Normalize
+    for (v, p) in results
+        results[v] = p/nor_sum
     end
 
     return ResultsSet(results, mapping, qc)  

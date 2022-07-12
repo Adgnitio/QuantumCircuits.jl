@@ -13,6 +13,7 @@
 using Test
 
 using QuantumCircuits
+using QuantumCircuits.Execute
 using QuantumCircuits.Circuit
 using QuantumCircuits.Registers
 
@@ -105,9 +106,6 @@ qc.y(qr)
 ###############################################################
 #                  Set                                        #
 ###############################################################
-using QuantumCircuits
-using QuantumCircuits.Execute
-
 
 
 for i in 0:2^3-1   
@@ -115,12 +113,12 @@ for i in 0:2^3-1
           nqr = QuantumRegister(3, "a", tomeasure=false)
           num_a = QuantumInteger(3)
           num_b = QuantumInteger(3)
-          #nqc = QCircuit([nqr, num_a, num_b])
-          regs = Vector{QuantumAbstractRegister}()
-          push!(regs, nqr)
-          push!(regs, num_a) 
-          push!(regs, num_b)
-          nqc = QCircuit(regs) 
+          nqc = QCircuit([nqr, num_a, num_b])
+          # regs = Vector{QuantumAbstractRegister}()
+          # push!(regs, nqr)
+          # push!(regs, num_a) 
+          # push!(regs, num_b)
+          # nqc = QCircuit(regs) 
 
           nqc.set!(num_a, i)
           nqc.set!(num_b, j)
@@ -155,29 +153,25 @@ end
 ###############################################################
 #                  Add                                        #
 ###############################################################
-# # Add 2 to register num_a
+# Add 2 to register num_a
 
-# num_a = QuantumInteger(3)
-# nqc = QCircuit([num_a])
-# nqc.set!(num_a, 3)
+using QuantumCircuits.QCircuits.QLib # TODO
+using QuantumCircuits.QCircuits.Arithmetic
 
+n_qubits = 3
+for i in 0:(2^n_qubits-1)
+     for j in 0:(2^n_qubits-1)
+          if i + j < 2^n_qubits
+               num_a = QuantumInteger(n_qubits)
+               nqc = QCircuit([num_a])
+               nqc.set!(num_a, i)
+               nqc.add!(num_a, j)
 
-# #nqc.add!(num_a, 2)
-# nqc.measure()
+               nqc.measure()
+               rs = getresults(nqc)
+               @test abs(rs[num_a][i+j] - 1.0) < 1e-8
+          end
+     end
+end
 
-
-# rs = getresults(nqc)
-# rs[num_a]
-
-
-# @test abs(rs[num_a][i] - 1.0) < 1e-8
-# @test abs(rs[num_b][j] - 1.0) < 1e-8
-
-
-# qc.add!(num_a, 2)
-
-###
-
-#num_a.state
-
-#qc.cp(pi/2, 1, 2)
+###############################################################

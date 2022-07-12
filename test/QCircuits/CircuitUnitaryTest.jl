@@ -147,10 +147,14 @@ function test_unitary(qubits, gates, expected_param=0; inline_optimization=true,
         add!(circ, g, args...)
     end
     if usedecompose
-        circ = decompose(circ)
+        dcirc = decompose(circ)
+    else
+        dcirc = circ
     end
-    @test unitary_error(tomatrix(toQiskit(circ)), tomatrix(circ)) < 1e-8
-    test_derivate(circ, expected_param)
+
+
+    @test unitary_error(tomatrix(toQiskit(circ)), tomatrix(dcirc)) < 1e-8
+    test_derivate(dcirc, expected_param)
 end
 
 test_unitary(2, [(CX, [0, 1])])
@@ -193,7 +197,15 @@ for λ in λs
     test_unitary(2, [(X, [0]), (X, [1]), (CP, (0, 1, λ))], usedecompose=true)
     test_unitary(2, [(CP, (1, 0, λ))], usedecompose=true)
     test_unitary(2, [(X, [0]), (X, [1]), (CP, (1, 0, λ))], usedecompose=true)
+    test_unitary(2, [(H, [1]), (CP, (1, 0, λ), (H, [0]))], usedecompose=true)
+
+    # minus
+    test_unitary(2, [(X, [0]), (X, [1]), (CP, (0, 1, -λ))], usedecompose=true)
+    test_unitary(2, [(CP, (1, 0, -λ))], usedecompose=true)
+    test_unitary(2, [(X, [0]), (X, [1]), (CP, (1, 0, -λ))], usedecompose=true)
+    test_unitary(2, [(H, [1]), (CP, (1, 0, -λ), (H, [0]))], usedecompose=true)
 end
+
 
 ################################################################################
 #  Swap                                                                        #

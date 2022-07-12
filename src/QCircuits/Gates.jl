@@ -18,7 +18,7 @@ using QuantumCircuits.QCircuits.Registers
 
 import Base: show, length, inv
 import QuantumCircuits.QCircuits.QBase: tomatrix, setparameters!, simplify,
-       standardGateError, decompose, bindparameters!
+       standardGateError, decompose, bindparameters!, needbedecompsed
 
 export X, Y, Z, S, Sd, T, Td, H, CX, U3, Rx, Ry, Rz, U, Sx, Sxd, P, CP, Swap,
       getqubits, getqubitsids, toU3,
@@ -346,11 +346,15 @@ struct CP <: TwoQubitsGate
     target::Qubit
     λ::Parameter
 end
-Base.:(==)(g1::CP, g2::CP) = g1.control == g2.control && g1.target == g2.target
-Base.hash(g::CP, h::UInt) = hash((g.control, g.target), h)
+Base.:(==)(g1::CP, g2::CP) = g1.control == g2.control && g1.target == g2.target && g1.λ == g2.λ
+Base.hash(g::CP, h::UInt) = hash((g.control, g.target, g.λ), h)
 function Base.:(>)(x::CP, y::CP)
     if x.control == y.control
-        return x.target > y.target
+        if x.target == y.target
+            x.λ > y.λ
+        else
+            return x.target > y.target
+        end
     else
         return x.control > y.control
     end
@@ -723,6 +727,7 @@ getqubitsids(gate::TwoQubitsGate) = (getid(gate.control), getid(gate.target))
 "Show method"
 Base.show(io::IO, gate::QuantumGate) = print(io, "$(typeof(gate))($(gate.qubit))")
 Base.show(io::IO, gate::TwoQubitsGate) = print(io, "$(typeof(gate))($(gate.control), $(gate.target))")
+Base.show(io::IO, gate::CP) = print(io, "$(typeof(gate))($(gate.control), $(gate.target), $(gate.λ))")
 
 
 
@@ -950,6 +955,7 @@ const singlequbitsgates = Dict(Xmatrix => X,
 # TODO  + I !!!!!
 
 decompose(gate::QuantumGate) = [gate]
+needbedecompsed(::QuantumGate) = false
 
 "The simplify the gates."
 simplify(gate::QuantumGate) = [gate]

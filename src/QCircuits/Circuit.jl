@@ -33,7 +33,7 @@ using LinearAlgebra
 using CBOOCall: @cbooify
 
 import QuantumCircuits.QCircuits.QBase: add!, tomatrix, setparameters!, simplify,
-       standardGateError, decompose, measure!, bindparameters!
+       standardGateError, decompose, measure!, bindparameters!, needbedecompsed
 import Base.show
 
 export QCircuit, getparameters, getRandParameters, toString, setClassicalRegister!, toPythonQiskitCode, ismeasured
@@ -110,7 +110,7 @@ mutable struct QCircuit <: QuantumCircuit
 end
 QCircuit(n::Integer; inline_optimization=true) = QCircuit([QuantumRegister(n)], [ClassicalRegister(n)], inline_optimization=inline_optimization)
 QCircuit(qReg::QuantumAbstractRegister, cReg::ClassicalRegister; inline_optimization=true) = QCircuit([qReg], [cReg], inline_optimization=inline_optimization)
-QCircuit(reg::QuantumAbstractRegister; inline_optimization=true) = QCircuit([reg], ClassicalRegister[], inline_optimization=inline_optimization)
+QCircuit(reg::QuantumAbstractRegister; inline_optimization=true) = QCircuit([reg], ClassicalRegister[ClassicalRegister(reg.tomeasure ? length(reg) : 0)], inline_optimization=inline_optimization)
 QCircuit(regs::Vector{<:QuantumAbstractRegister}; inline_optimization=true) = QCircuit(regs, [ClassicalRegister(sum([(i.tomeasure ? length(i) : 0) for i in regs]))], inline_optimization=inline_optimization)
 QCircuit(regs::Vector{<:QuantumAbstractRegister}, cReg::ClassicalRegister; inline_optimization=true) = QCircuit(regs, [cReg], inline_optimization=inline_optimization)
 function QCircuit(qc::QCircuit)
@@ -179,10 +179,6 @@ cp(qc::QCircuit, q1, q2, λ=ParameterT(rand()*2π)) = add!(qc, CP, q1, q2, λ)
 barrier(qc::QCircuit) = add!(qc, Barrier(qc.vqubits))
 measure(qc::QCircuit, q, c) = measure!(qc, q, c)
 measure(qc::QCircuit) = measure!(qc)
-
-function add!(qc::QCircuit, reg::QuantumInteger, num::Number)
-    println("Test add!")
-end
 
 
 function set!(qc::QCircuit, reg::QuantumInteger, num::Integer)
@@ -629,6 +625,11 @@ function decompose(qc::QCircuit)
         end
     end
 
+    # add measrments
+    for (q, c) in qc.measures        
+        newqc.measure(getid(q), getid(c))
+   end
+
     return newqc
 end
 
@@ -639,11 +640,11 @@ function decompose(gate::CP)
 # q_1: ──────────┤ X ├┤ P(-λ/2) ├┤ X ├┤ P(λ/2) ├
 #                └───┘└─────────┘└───┘└────────┘   
     return [
-        P(gate.control, gate.λ),
+        P(gate.control, gate.λ/2),
         CX(gate.control, gate.target),
-        P(gate.target, gate.λ),
+        P(gate.target, -gate.λ/2),
         CX(gate.control, gate.target),
-        P(gate.target, gate.λ)
+        P(gate.target, gate.λ/2)
     ]
 end
 
@@ -659,6 +660,11 @@ function decompose(gate::Swap)
         CX(gate.control, gate.target)        
     ]
 end
+
+
+needbedecompsed(qc::QCircuit) = any(needbedecompsed(gate) for gate in getCode(qc))
+needbedecompsed(::CP) = true
+needbedecompsed(::Swap) = true
 
 
 function simplify(qc::QCircuit)

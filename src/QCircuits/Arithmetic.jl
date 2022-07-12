@@ -10,23 +10,29 @@
 # copyright notice, and modified files need to carry a notice indicating
 # that they have been altered from the originals.
 
-module QCircuits
+module Arithmetic
 
-include("Math.jl")
-include("QBase.jl")
-include("Registers.jl")
-include("Gates.jl")
-include("Instructions.jl")
-include("OtherGates.jl")
-include("ComplexGates.jl")
-include("Graph.jl")
-include("Qiskit.jl")
-include("Circuit.jl")
-include("QLib.jl")
-include("Arithmetic.jl")
-
+using QuantumCircuits.QCircuits
 using QuantumCircuits.QCircuits.Circuit
+using QuantumCircuits.QCircuits.Registers
+using QuantumCircuits.QCircuits.QLib
 
-export QCircuit
+import QuantumCircuits.QCircuits.QBase: add!
 
-end # module
+function add!(qc::QCircuit, reg::QuantumInteger, num::Number)
+    println("Test add!")
+
+    # QFT
+    qft!(qc, reg, doswap=false)
+
+    # Addition
+    for i in 0:2
+        qc.p(reg[i], num * 2π/2^(i+1))
+    end
+
+    # Inverse QFT
+    qft!(qc, reg, doswap=false, inverse=true)
+end
+
+
+end  # module Arithmetic
